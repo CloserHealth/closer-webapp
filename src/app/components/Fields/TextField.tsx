@@ -12,14 +12,14 @@ export default function TextField({ label, placeholder, value, require, id, type
 
     return (
         <div className="w-full">
-            <label htmlFor={id} className="block mb-2 text-[1vw] font-medium text-gray-900 dark:text-white w-full">{label}</label>
+            <label htmlFor={id} className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">{label}</label>
             <div className="relative">
                 <input
                     type={viewPassword ? "text" : type}
                     id={id}
                     value={value}
                     onChange={onInputChange}
-                    className={`${withBackground ? 'bg-white' : 'bg-transparent'} border border-[#DDE2E5] text-gray-900 text-[1vw] rounded-[5px] outline-none w-full px-4 py-3`}
+                    className={`${withBackground ? 'bg-white' : 'bg-transparent'} border border-[#E3E4E8] text-gray-900 text-[4vw] rounded-[8px] outline-none w-full px-4 py-3`}
                     placeholder={placeholder}
                     required={require}
                     readOnly={readOnly}

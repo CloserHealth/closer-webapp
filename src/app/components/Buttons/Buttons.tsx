@@ -26,11 +26,13 @@ export function AuthButton({ content, type, isDisabled, isLoading }: AuthButtonP
 }
 
 
-export function AppButton({ content, onClickButton, isRounded, isLoading }: AppButtonProps) {
+export function AppButton({ content, onClickButton, isRounded, isLoading, type, isDisabled }: AppButtonProps) {
     return (
         <button
             onClick={onClickButton}
             className={`w-full ${isRounded ? 'rounded-full' : 'rounded-[5px]'} py-3 bg-primaryColor cursor-pointer text-white font-[400] text-[4vw]`}
+            type={type}
+            disabled={isDisabled}
             style={{ border: "1px solid rgba(63, 63, 68, 0.00)" }}>
             {isLoading ? (
                 <span className="flex items-center justify-center">

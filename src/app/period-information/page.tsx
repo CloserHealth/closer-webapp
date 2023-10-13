@@ -8,7 +8,7 @@ import Assets from '@/constants/assets.constant';
 import TextField from '../components/Fields/TextField';
 
 
-export default function Signup() {
+export default function PeriodInformation() {
     const router = useRouter();
     const [openModal, setOpenModal] = useState<boolean>(false);
     const handleOpenModal = () => {
@@ -18,13 +18,18 @@ export default function Signup() {
         setOpenModal(false);
     }
 
-    // Navigate to Signup
-    const goToSignup = () => {
-        router.push('/signup');
+    // Navigate to Login
+    const goToLogin = () => {
+        router.push('/login');
     }
 
+    const [name, setName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>("");
+
+    const handleNameChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+        setName(event.target.value);
+    };
 
     const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
         setEmail(event.target.value);
@@ -36,7 +41,8 @@ export default function Signup() {
         setPassword(event.target.value);
     };
 
-    // Validation rules for the email and Password inputs
+    // Validation rules for the name, email and Password inputs
+    const isNameValid = name.length > 3;
     const isEmailValid = email.length > 5 && email.includes('@');
     const isPasswordValid = password.length > 3;
 
@@ -47,44 +53,42 @@ export default function Signup() {
                     <div className="absolute left-0">
                         <Image src={Assets.backIconBlack} alt="" width={12} height={12} />
                     </div>
-                    <p className="text-[#17181C] font-[600] text-[4.5vw]">Login</p>
+                    <p className="text-[#17181C] font-[600] text-[4.5vw]">Period Information</p>
                 </div>
-                <form className="mt-12 w-full h-auto space-y-10">
+                <form className="mt-12 w-full h-auto space-y-16">
                     <div>
                         <div className="space-y-5">
                             <TextField
-                                id="email"
-                                type="email"
-                                label="Email address"
-                                placeholder="Enter email"
-                                value={email}
-                                onInputChange={handleEmailChange}
+                                id="firstName"
+                                type="text"
+                                label="Period Length"
+                                placeholder="Enter period length (Days)"
+                                value={name}
+                                onInputChange={handleNameChange}
                                 require={false}
                                 isPassword={false}
                                 withBackground={false}
                                 readOnly={false}
                             />
                             <TextField
-                                id="password"
-                                type="password"
-                                label="Password"
-                                placeholder="Password"
-                                value={password}
-                                onInputChange={handlePasswordChange}
-                                require={true}
-                                isPassword={true}
+                                id="lastName"
+                                type="text"
+                                label="Last Period"
+                                placeholder="Select last period"
+                                value={name}
+                                onInputChange={handleNameChange}
+                                require={false}
+                                isPassword={false}
                                 withBackground={false}
                                 readOnly={false}
                             />
-
-                        </div>
-                        <p className="mt-3 text-[#B7B3BF] text-[3.5vw] font-[400] text-right">Don’t have an account? <span className="text-primaryColor cursor-pointer hover:underline underline-offset-4" onClick={goToSignup}>Sign Up</span></p>
+                    </div>
                     </div>
                     <div>
                         <AppButton 
                         type="submit" 
-                        content="Login" 
-                        isDisabled={!isEmailValid || !isPasswordValid} 
+                        content="Submit" 
+                        isDisabled={!isNameValid || !isEmailValid || !isPasswordValid} 
                         isLoading={false}
                         onClickButton={() => {}}
                         isRounded={true} 
