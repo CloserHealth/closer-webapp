@@ -46,6 +46,8 @@ export interface AppButtonProps {
     onClickButton: () => void;
     isRounded: boolean;
     isLoading: any;
+    type: any;
+    isDisabled: boolean;
 }
 
 export interface OutlinedButtonProps {

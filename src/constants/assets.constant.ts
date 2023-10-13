@@ -36,12 +36,16 @@ import camera from '../app/assets/icons/camera.svg';
 import arrowIconRight from '../app/assets/icons/arrow-right-red.svg';
 import editPen from '../app/assets/icons/edit-pen.svg';
 import goalIcon from '../app/assets/icons/goal-icon.svg';
+import backIconBlack from '../app/assets/icons/back.svg';
+import calendarGrey from '../app/assets/icons/calendar-grey.svg';
 import sample from '../app/assets/images/sample.jpeg';
 import smilingGirl2 from '../app/assets/images/smiling-girl-2.png';
 import landingImage from '../app/assets/images/landing-image.png';
 
 
 const Assets = {
+  calendarGrey,
+  backIconBlack,
   landingImage,
   goalIcon,
   editPen,
