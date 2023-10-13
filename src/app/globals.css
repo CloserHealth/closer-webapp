@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -16,12 +17,14 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+* {
+  font-family: 'Manrope', sans-serif;
+}
+
+/* .MuiBackdrop-root {
+  background: rgba(43, 10, 96, 0.31);
+} */
+
+.css-acobh5-MuiButtonBase-root-MuiChip-root .MuiChip-deleteIcon {
+  color: rgba(43, 10, 96, 0.31);
 }
