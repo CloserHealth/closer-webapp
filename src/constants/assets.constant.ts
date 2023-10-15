@@ -47,9 +47,17 @@ import lutealPhase from '../app/assets/icons/luteal-phase.svg';
 import ovulationPhase from '../app/assets/icons/ovulation-phase.svg';
 import periodPhase from '../app/assets/icons/period-phase.svg';
 import calendar from '../app/assets/icons/calendar.svg';
+import home from '../app/assets/icons/home.svg';
+import navbarCalendar from '../app/assets/icons/navbar-calendar.svg';
+import symptoms from '../app/assets/icons/symptom.svg';
+import task from '../app/assets/icons/task.svg';
 
 
 const Assets = {
+  task,
+  symptoms,
+  home,
+  navbarCalendar,
   calendar,
   periodPhase,
   ovulationPhase,

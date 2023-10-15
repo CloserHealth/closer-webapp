@@ -7,43 +7,26 @@ import { useRouter } from 'next/navigation';
 import Assets from '@/constants/assets.constant';
 import TextField from '../components/Fields/TextField';
 import { IconButton } from '@mui/material';
+import useLoginController from './controller';
 
 
-export default function Signup() {
-    const router = useRouter();
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const handleOpenModal = () => {
-        setOpenModal(true);
-    }
-    const handleCloseModal = () => {
-        setOpenModal(false);
-    }
+export default function Login() {
+    const {
+        onSubmit,
+        handlePasswordChange,
+        handleEmailChange,
+        password,
+        email,
+        isPasswordValid,
+        isEmailValid,
+        isLoading,
+        goToSignup
+    } = useLoginController();
 
-    // Navigate to Signup
-    const goToSignup = () => {
-        router.push('/signup');
-    }
-
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>("");
-
-    const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-        setEmail(event.target.value);
-    };
-
-    const handlePasswordChange = (event: {
-        target: { value: React.SetStateAction<string> };
-    }) => {
-        setPassword(event.target.value);
-    };
-
-    // Validation rules for the email and Password inputs
-    const isEmailValid = email.length > 5 && email.includes('@');
-    const isPasswordValid = password.length > 3;
 
     return (
         <>
-            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative'>
+            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative bg-white'>
                 <div className="w-full flex justify-center items-center relative">
                     <div className="absolute left-0">
                         <IconButton>
@@ -52,7 +35,7 @@ export default function Signup() {
                     </div>
                     <p className="text-[#17181C] font-[600] text-[4.5vw]">Login</p>
                 </div>
-                <form className="mt-12 w-full h-auto space-y-10">
+                <form className="mt-12 w-full h-auto space-y-10" onSubmit={onSubmit}>
                     <div>
                         <div className="space-y-5">
                             <TextField
@@ -88,23 +71,13 @@ export default function Signup() {
                             type="submit"
                             content="Login"
                             isDisabled={!isEmailValid || !isPasswordValid}
-                            isLoading={false}
+                            isLoading={isLoading}
                             onClickButton={() => { }}
                             isRounded={true}
                         />
                     </div>
                 </form>
             </div>
-
-            {openModal && (
-                <AppModal
-                    header="Account creation successful!"
-                    text="Your account has been created successfully. Check your email for login credentials."
-                    buttonText="Proceed to Login"
-                    onClick={() => { }}
-                    onClose={handleCloseModal}
-                />
-            )}
         </>
     )
 }

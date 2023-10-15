@@ -67,8 +67,8 @@ export default function PeriodInformation() {
 
                 const { message, data } = res.data;
                 const user = {
-                  data,
-                  accessToken: profile?.accessToken,
+                    data,
+                    accessToken: profile?.accessToken,
                 };
 
                 if (message === "Profile updated successfully!") {
@@ -87,7 +87,7 @@ export default function PeriodInformation() {
 
     return (
         <>
-            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative'>
+            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative bg-white'>
                 <div className="w-full flex justify-center items-center relative">
                     <div className="absolute left-0">
                         <IconButton>
@@ -138,6 +138,9 @@ export default function PeriodInformation() {
                                     setDate={setDate}
                                     selectRange={selectRange}
                                     setSelectRange={setSelectRange}
+                                    periodStartDate={undefined}
+                                    periodEndDate={undefined}
+                                    tileContent={undefined}
                                 />
                             )}
                         </div>

@@ -7,49 +7,6 @@ export const parseUrl = (link: string) => (link.endsWith('/') ? link : `${link}/
 export const isUrl = (value: string) => yup.string().url().isValidSync(value);
 export const isBaseUrl = (value: string) => value.endsWith('https://') || value.endsWith('http://');
 
-export const convertImageToBase64 = async (file: File): Promise<string> =>
-  new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      const base64String = dataUrl.split(',')[1];
-      resolve(base64String);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-
-export const convertUrlToBase64 = async (url: string): Promise<string> => {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      const base64String = dataUrl.split(',')[1];
-      resolve(base64String);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
-
-
-export const goToLink = (link: string) => {
-  const a = document.createElement('a');
-  a.href = link;
-  // a.target = '_blank';
-  a.rel = 'noopener nonreferrer';
-  a.click();
-};
-
-export const goToLinkNewTab = (link: string) => {
-  const a = document.createElement('a');
-  a.target = '_blank';
-  a.href = link;
-  a.rel = 'noopener nonreferrer';
-  a.click();
-};
 
 /**
  * This helps to remove any field that has empty strings.
@@ -67,16 +24,23 @@ export const goToLinkNewTab = (link: string) => {
   return newValues;
 };
 
+  // Calculate days left
+// Calculate days left
+export const calculateDaysLeft = (endDateStr: string | number | Date, startDateStr: string | number | Date) => {
+  const endDate = new Date(endDateStr);
+  const startDate = new Date(startDateStr);
+  const currentDate = new Date();
 
-export const getEventImage = (images: string[]) => {
-  const defaultImage =
-    'https://images.pexels.com/photos/7991486/pexels-photo-7991486.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+  if (isNaN(endDate.getTime()) || isNaN(startDate.getTime())) {
+    throw new Error('Invalid date format');
+  }
 
-  return (
-    images.find(
-      (image) => image.startsWith('http://res.cloudinary.com') || image.startsWith('https://res.cloudinary.com')
-    ) || defaultImage
-  );
+  // Calculate the difference in milliseconds
+  const differenceInMillis = endDate.getTime() - currentDate.getTime();
+
+  // Convert milliseconds to days
+  const daysLeft = Math.ceil(differenceInMillis / (1000 * 60 * 60 * 24));
+
+  return daysLeft;
 };
 
-export const roundToNearest10 = (num: number) => Math.ceil(num / 10) * 10;

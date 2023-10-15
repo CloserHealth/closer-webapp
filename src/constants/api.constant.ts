@@ -14,7 +14,7 @@ export const API = {
 
 
   // Dashboard
-  dashboard: '/admin/dashboard?year=2023',
+  dashboard: '/dashboard',
 
   // Users
   users: '/admin/users',
