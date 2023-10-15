@@ -118,13 +118,17 @@ export default function Vefification() {
 
     const IDisabled = code.length < 4;
 
+    const goBack = () => {
+        router.back();
+    };
+
 
     return (
         <>
             <div className='w-full min-h-[100vh] px-5 pt-7 pb-20 relative bg-white'>
                 <div className="w-full flex justify-center items-center relative">
                     <div className="absolute left-0">
-                        <IconButton>
+                        <IconButton onClick={goBack}>
                             <Image src={Assets.backIconBlack} alt="" width={10} height={10} />
                         </IconButton>
                     </div>

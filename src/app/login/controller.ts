@@ -71,7 +71,12 @@ const useLoginController = () => {
     router.push('/signup');
   };
 
+  const goBack = () => {
+    router.back();
+  }
+
   return {
+    goBack,
     goToSignup,
     onSubmit,
     isLoading,

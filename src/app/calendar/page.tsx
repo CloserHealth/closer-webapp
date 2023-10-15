@@ -120,7 +120,7 @@ const Calendar = () => {
 
     return (
         <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto'>
-            <div className="fixed top-0 right-0 left-0">
+            <div className="fixed top-0 right-0 left-0 z-50">
                 <MobileNavbar />
             </div>
             <div className='mt-28'>
@@ -134,15 +134,15 @@ const Calendar = () => {
                 </div>
 
                 {/* Calendar */}
-                <CustomCalendar
-                    date={date}
-                    setDate={setDate}
-                    selectRange={false}
-                    setSelectRange={setSelectRange}
-                    periodStartDate={periodStartDate}
-                    periodEndDate={periodEndDate}
-                    tileContent={tileContent}
-                />
+                    <CustomCalendar
+                        date={date}
+                        setDate={setDate}
+                        selectRange={false}
+                        setSelectRange={setSelectRange}
+                        periodStartDate={periodStartDate}
+                        periodEndDate={periodEndDate}
+                        tileContent={tileContent}
+                    />
 
                 <div className="mt-7 grid grid-cols-1 gap-y-5">
                     {/* {phases.map((item, i) => (
@@ -159,7 +159,16 @@ const Calendar = () => {
                         style={{ background: '#594D94', boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
                         <div className="flex space-x-2 items-center">
                             <h1 className="text-[4.5vw] font-[800] text-white">{phase?.name} Phase</h1>
-                            <Image src={Assets.follicularPhase} alt='' width={20} height={20} />
+                            <Image
+                                src={
+                                    phase?.name === 'Follicular' ? Assets.follicularPhase :
+                                        phase?.name === 'Luteal' ? Assets.lutealPhase : phase?.name === 'Ovulation' ? Assets.ovulationPhase :
+                                            Assets.periodPhase
+                                }
+                                alt=''
+                                width={20}
+                                height={20}
+                            />
                         </div>
                         <div className="mt-5 space-y-3">
                             {phase?.tips?.map((tip: any, i: any) => (
