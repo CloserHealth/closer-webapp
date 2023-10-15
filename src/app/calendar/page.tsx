@@ -119,7 +119,7 @@ const Calendar = () => {
 
 
     return (
-        <div className='px-5 pb-20 relative min-h-[100vh]'>
+        <div className='px-5 pb-20 min-h-[100vh]'>
             <div className="fixed top-0 right-0 left-0">
                 <MobileNavbar />
             </div>

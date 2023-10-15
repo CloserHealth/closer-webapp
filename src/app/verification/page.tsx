@@ -78,7 +78,7 @@ export default function Vefification() {
                 //     })
                 // );
 
-                next();
+                router.push('/period-information');
             })
             .catch((error: AxiosError) => {
                 const res = error.response;

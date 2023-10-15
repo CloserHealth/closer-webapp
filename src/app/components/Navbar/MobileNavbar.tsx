@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Assets from '@/constants/assets.constant';
 import { IconButton } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { FadeIn } from '../Transitions/Transitions';
 import { profileLogoutAction } from '@/store/profile.slice';
 import { useDispatch } from 'react-redux';
 
 const MobileNavbar = () => {
     const router = useRouter();
+    const pathName = usePathname();
     const [navMenu, setNavMenu] = useState<boolean>(false);
-    const currentPath = window.location.pathname;
+    const currentPath = pathName;
     const dispatch = useDispatch();
 
     const navbarMenus = [
