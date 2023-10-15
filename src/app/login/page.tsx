@@ -6,6 +6,7 @@ import { AppModal } from '../components/Modals/Modals';
 import { useRouter } from 'next/navigation';
 import Assets from '@/constants/assets.constant';
 import TextField from '../components/Fields/TextField';
+import { IconButton } from '@mui/material';
 
 
 export default function Signup() {
@@ -45,7 +46,9 @@ export default function Signup() {
             <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative'>
                 <div className="w-full flex justify-center items-center relative">
                     <div className="absolute left-0">
-                        <Image src={Assets.backIconBlack} alt="" width={12} height={12} />
+                        <IconButton>
+                            <Image src={Assets.backIconBlack} alt="" width={10} height={10} />
+                        </IconButton>
                     </div>
                     <p className="text-[#17181C] font-[600] text-[4.5vw]">Login</p>
                 </div>
@@ -81,13 +84,13 @@ export default function Signup() {
                         <p className="mt-3 text-[#B7B3BF] text-[3.5vw] font-[400] text-right">Don’t have an account? <span className="text-primaryColor cursor-pointer hover:underline underline-offset-4" onClick={goToSignup}>Sign Up</span></p>
                     </div>
                     <div>
-                        <AppButton 
-                        type="submit" 
-                        content="Login" 
-                        isDisabled={!isEmailValid || !isPasswordValid} 
-                        isLoading={false}
-                        onClickButton={() => {}}
-                        isRounded={true} 
+                        <AppButton
+                            type="submit"
+                            content="Login"
+                            isDisabled={!isEmailValid || !isPasswordValid}
+                            isLoading={false}
+                            onClickButton={() => { }}
+                            isRounded={true}
                         />
                     </div>
                 </form>

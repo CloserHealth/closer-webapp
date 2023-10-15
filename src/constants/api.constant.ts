@@ -3,13 +3,15 @@ export const API_HOST = 'https://api.closer.health';
 
 export const API = {
   // Auth
-  login: '/admin/auth/login',
-  logout: '/admin/auth/logout',
+  login: '/auth/login',
+  register: '/auth/register',
+  logout: '/auth/logout',
   changePassword: '/auth/password/change',
-  resetPassword: '/admin/auth/password/reset',
-  verify: '/admin/auth/password/verify',
-  resendToken: '/admin/auth/password/resend',
-  adminUser: '/admin/auth/user',
+  resetPassword: '/auth/password/reset',
+  verify: '/auth/email/verify',
+  resendToken: '/auth/email/resend',
+  updateUser: '/auth/user/update',
+
 
   // Dashboard
   dashboard: '/admin/dashboard?year=2023',
