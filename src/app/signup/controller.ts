@@ -101,7 +101,12 @@ const useSignupController = () => {
     );
   };
 
+  const goBack = () => {
+    router.back();
+  }
+
   return {
+    goBack,
     onSubmit,
     handlePasswordChange,
     handleConfirmPasswordChange,
