@@ -87,7 +87,7 @@ export default function PeriodInformation() {
 
     return (
         <>
-            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative bg-white'>
+            <div className='w-full min-h-[100vh] px-5 pt-7 pb-20 relative bg-white'>
                 <div className="w-full flex justify-center items-center relative">
                     <div className="absolute left-0">
                         <IconButton>

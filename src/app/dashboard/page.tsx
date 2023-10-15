@@ -195,7 +195,7 @@ const Dashboard = () => {
       {!isUser ? (
         <SplashScreen />
       ) : (
-        <div className='px-5 pb-20 relative h-[100vh]'>
+        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto'>
           <div className="fixed top-0 right-0 left-0">
             <MobileNavbar />
           </div>
