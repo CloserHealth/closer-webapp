@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 
 function useCountdown(timeInSeconds: number): [string, boolean, (count: number) => any] {

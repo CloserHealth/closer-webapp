@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { sanitiseFormData } from "@/helpers";
 import toast from "react-hot-toast";
 import API from "@/constants/api.constant";
+import useGlobalState from "@/hooks/globalstate.hook";
 
 const useLoginController = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,7 @@ const useLoginController = () => {
   const { isLoading, makeRequest } = useRequest();
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const {profile} = useGlobalState();
 
   const handlePasswordChange = (event: {
     target: { value: React.SetStateAction<string> };
@@ -49,12 +51,12 @@ const useLoginController = () => {
         const { message, data } = res.data;
         const user = {
           data,
-          accessToken: data.token,
+          accessToken: data?.token,
         };
 
         if (message === "Login successful!") {
           toast.success(message);
-          router.push("/");
+          router.push("/dashboard");
         }
 
         dispatch(profileLoginAction(user));
@@ -65,7 +67,12 @@ const useLoginController = () => {
     );
   };
 
+  const goToSignup = () => {
+    router.push('/signup');
+  };
+
   return {
+    goToSignup,
     onSubmit,
     isLoading,
     handlePasswordChange,

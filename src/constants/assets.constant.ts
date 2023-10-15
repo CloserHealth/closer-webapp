@@ -38,12 +38,32 @@ import editPen from '../app/assets/icons/edit-pen.svg';
 import goalIcon from '../app/assets/icons/goal-icon.svg';
 import backIconBlack from '../app/assets/icons/back.svg';
 import calendarGrey from '../app/assets/icons/calendar-grey.svg';
+import menu from '../app/assets/icons/menu.svg';
 import sample from '../app/assets/images/sample.jpeg';
 import smilingGirl2 from '../app/assets/images/smiling-girl-2.png';
 import landingImage from '../app/assets/images/landing-image.png';
+import follicularPhase from '../app/assets/icons/follicular-phase.svg';
+import lutealPhase from '../app/assets/icons/luteal-phase.svg';
+import ovulationPhase from '../app/assets/icons/ovulation-phase.svg';
+import periodPhase from '../app/assets/icons/period-phase.svg';
+import calendar from '../app/assets/icons/calendar.svg';
+import home from '../app/assets/icons/home.svg';
+import navbarCalendar from '../app/assets/icons/navbar-calendar.svg';
+import symptoms from '../app/assets/icons/symptom.svg';
+import task from '../app/assets/icons/task.svg';
 
 
 const Assets = {
+  task,
+  symptoms,
+  home,
+  navbarCalendar,
+  calendar,
+  periodPhase,
+  ovulationPhase,
+  lutealPhase,
+  follicularPhase,
+  menu,
   calendarGrey,
   backIconBlack,
   landingImage,

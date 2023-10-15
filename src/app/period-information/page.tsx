@@ -6,11 +6,34 @@ import { AppModal } from '../components/Modals/Modals';
 import { useRouter } from 'next/navigation';
 import Assets from '@/constants/assets.constant';
 import TextField from '../components/Fields/TextField';
+import { IconButton } from '@mui/material';
+import API from '@/constants/api.constant';
+import { catchAsync } from '@/helpers/api.helper';
+import useRequest from '@/services/request.service';
+import DatePicker from 'react-date-picker';
+import CustomCalendar from '../components/Calendar/Calendar';
+import useGlobalState from '@/hooks/globalstate.hook';
+import { profileUpdateAction } from '@/store/profile.slice';
+import { useDispatch } from 'react-redux';
 
 
 export default function PeriodInformation() {
+    const { profile } = useGlobalState();
+    const dispatch = useDispatch();
     const router = useRouter();
+    const { isLoading, makeRequest } = useRequest();
+    const [date, setDate] = useState<any>(new Date());
+    const [selectRange, setSelectRange] = useState<any>(false);
+    const [datePicker, setDatePicker] = useState<boolean>(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
+
+    // Format date
+    const formattedDate = date.toLocaleDateString('en-GB')
+        .split('/')
+        .reverse()
+        .join('-'); // Format as "YYYY-MM-DD"
+
+
     const handleOpenModal = () => {
         setOpenModal(true);
     }
@@ -18,80 +41,118 @@ export default function PeriodInformation() {
         setOpenModal(false);
     }
 
-    // Navigate to Login
-    const goToLogin = () => {
-        router.push('/login');
+    const [periodLength, setPeriodLength] = useState<number>(0);
+
+    const handlePeriodLengthChange = (event: { target: { value: React.SetStateAction<number>; }; }) => {
+        setPeriodLength(event.target.value);
     }
 
-    const [name, setName] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>("");
-
-    const handleNameChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-        setName(event.target.value);
-    };
-
-    const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-        setEmail(event.target.value);
-    };
-
-    const handlePasswordChange = (event: {
-        target: { value: React.SetStateAction<string> };
-    }) => {
-        setPassword(event.target.value);
-    };
-
     // Validation rules for the name, email and Password inputs
-    const isNameValid = name.length > 3;
-    const isEmailValid = email.length > 5 && email.includes('@');
-    const isPasswordValid = password.length > 3;
+    const isPeriodLengthValid = periodLength > 1;
+
+    const periodInfoData = {
+        period_length: periodLength,
+        period_date: formattedDate,
+    };
+
+    const onSubmit = async (e: { preventDefault: () => void }) => {
+        e.preventDefault();
+        catchAsync(
+            async () => {
+                const res = await makeRequest({
+                    method: "POST",
+                    url: API.updateUser,
+                    data: periodInfoData,
+                });
+
+                const { message, data } = res.data;
+                const user = {
+                    data,
+                    accessToken: profile?.accessToken,
+                };
+
+                if (message === "Profile updated successfully!") {
+                    handleOpenModal();
+                    router.push("/dashboard");
+                }
+
+                dispatch(profileUpdateAction(user));
+            },
+            (err: any) => {
+                console.log(err);
+            }
+        );
+    };
+
 
     return (
         <>
-            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative'>
+            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative bg-white'>
                 <div className="w-full flex justify-center items-center relative">
                     <div className="absolute left-0">
-                        <Image src={Assets.backIconBlack} alt="" width={12} height={12} />
+                        <IconButton>
+                            <Image src={Assets.backIconBlack} alt="" width={10} height={10} />
+                        </IconButton>
                     </div>
                     <p className="text-[#17181C] font-[600] text-[4.5vw]">Period Information</p>
                 </div>
-                <form className="mt-12 w-full h-auto space-y-16">
+                <form className="mt-12 w-full h-auto space-y-16" onSubmit={onSubmit}>
                     <div>
                         <div className="space-y-5">
                             <TextField
-                                id="firstName"
-                                type="text"
+                                id="periodLength"
+                                type="number"
                                 label="Period Length"
                                 placeholder="Enter period length (Days)"
-                                value={name}
-                                onInputChange={handleNameChange}
+                                value={periodLength}
+                                onInputChange={handlePeriodLengthChange}
                                 require={false}
                                 isPassword={false}
                                 withBackground={false}
                                 readOnly={false}
                             />
-                            <TextField
-                                id="lastName"
-                                type="text"
-                                label="Last Period"
-                                placeholder="Select last period"
-                                value={name}
-                                onInputChange={handleNameChange}
-                                require={false}
-                                isPassword={false}
-                                withBackground={false}
-                                readOnly={false}
-                            />
-                    </div>
+
+                            <div className="w-full">
+                                <label htmlFor='lastPeriod' className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">Last Period</label>
+                                <div className="relative">
+                                    <input
+                                        type='text'
+                                        id='lastPeriod'
+                                        value={formattedDate}
+                                        onChange={() => { }}
+                                        className={`border border-[#E3E4E8] text-gray-900 text-[4vw] rounded-[8px] outline-none w-full px-4 py-3`}
+                                        placeholder='What day did you start your last period?'
+                                    />
+
+                                    <div className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer' onClick={() => setDatePicker(!datePicker)}>
+                                        <IconButton>
+                                            <Image src={Assets.calendar} alt="" width={20} height={20} />
+                                        </IconButton>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Calendar */}
+                            {datePicker && (
+                                <CustomCalendar
+                                    date={date}
+                                    setDate={setDate}
+                                    selectRange={selectRange}
+                                    setSelectRange={setSelectRange}
+                                    periodStartDate={undefined}
+                                    periodEndDate={undefined}
+                                    tileContent={undefined}
+                                />
+                            )}
+                        </div>
                     </div>
                     <div>
-                        <AppButton 
-                        type="submit" 
-                        content="Submit" 
-                        isDisabled={!isNameValid || !isEmailValid || !isPasswordValid} 
-                        isLoading={false}
-                        onClickButton={() => {}}
-                        isRounded={true} 
+                        <AppButton
+                            type="submit"
+                            content="Submit"
+                            isDisabled={false}
+                            isLoading={isLoading}
+                            onClickButton={() => { }}
+                            isRounded={true}
                         />
                     </div>
                 </form>
@@ -100,12 +161,14 @@ export default function PeriodInformation() {
             {openModal && (
                 <AppModal
                     header="Account creation successful!"
-                    text="Your account has been created successfully. Check your email for login credentials."
-                    buttonText="Proceed to Login"
+                    text="Your account has been created successfully."
+                    buttonText="Proceeding to Dashboard..."
                     onClick={() => { }}
                     onClose={handleCloseModal}
                 />
             )}
+
+
         </>
     )
 }

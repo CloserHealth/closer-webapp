@@ -1,61 +1,56 @@
 "use client"
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { AppButton, AuthButton } from '../components/Buttons/Buttons';
+import { AppButton } from '../components/Buttons/Buttons';
 import { AppModal } from '../components/Modals/Modals';
-import { useRouter } from 'next/navigation';
 import Assets from '@/constants/assets.constant';
 import TextField from '../components/Fields/TextField';
+import useSignupController from './controller';
+import { IconButton } from '@mui/material';
 
 
 export default function Signup() {
-    const router = useRouter();
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const handleOpenModal = () => {
-        setOpenModal(true);
-    }
-    const handleCloseModal = () => {
-        setOpenModal(false);
-    }
+    const {
+        onSubmit,
+        handlePasswordChange,
+        handleConfirmPasswordChange,
+        handleEmailChange,
+        handleFirstNameChange,
+        handleLastNameChange,
+        firstName,
+        lastName,
+        password,
+        confirmPassword,
+        email,
+        isPasswordValid,
+        isConfirmPasswordValid,
+        isEmailValid,
+        isLoading,
+        goToLogin,
+        isFirstNameValid,
+        isLastNameValid,
+        openModal,
+        setOpenModal,
+        handleCloseModal,
+        handleOpenModal,
+        router,
+        passwordValidation,
+    } = useSignupController();
 
-    // Navigate to Login
-    const goToLogin = () => {
-        router.push('/login');
-    }
 
-    const [name, setName] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>("");
-
-    const handleNameChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-        setName(event.target.value);
-    };
-
-    const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-        setEmail(event.target.value);
-    };
-
-    const handlePasswordChange = (event: {
-        target: { value: React.SetStateAction<string> };
-    }) => {
-        setPassword(event.target.value);
-    };
-
-    // Validation rules for the name, email and Password inputs
-    const isNameValid = name.length > 3;
-    const isEmailValid = email.length > 5 && email.includes('@');
-    const isPasswordValid = password.length > 3;
 
     return (
         <>
-            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative'>
+            <div className='w-full min-h-[100vh] px-5 pt-10 pb-20 relative bg-white'>
                 <div className="w-full flex justify-center items-center relative">
                     <div className="absolute left-0">
-                        <Image src={Assets.backIconBlack} alt="" width={12} height={12} />
+                        <IconButton>
+                            <Image src={Assets.backIconBlack} alt="" width={10} height={10} />
+                        </IconButton>
                     </div>
                     <p className="text-[#17181C] font-[600] text-[4.5vw]">Create Account</p>
                 </div>
-                <form className="mt-12 w-full h-auto space-y-10">
+                <form className="mt-12 w-full h-auto space-y-10" onSubmit={onSubmit}>
                     <div>
                         <div className="space-y-5">
                             <TextField
@@ -63,8 +58,8 @@ export default function Signup() {
                                 type="text"
                                 label="First Name"
                                 placeholder="Enter first name"
-                                value={name}
-                                onInputChange={handleNameChange}
+                                value={firstName}
+                                onInputChange={handleFirstNameChange}
                                 require={false}
                                 isPassword={false}
                                 withBackground={false}
@@ -75,8 +70,8 @@ export default function Signup() {
                                 type="text"
                                 label="Last Name"
                                 placeholder="Enter last name"
-                                value={name}
-                                onInputChange={handleNameChange}
+                                value={lastName}
+                                onInputChange={handleLastNameChange}
                                 require={false}
                                 isPassword={false}
                                 withBackground={false}
@@ -111,8 +106,8 @@ export default function Signup() {
                                 type="password"
                                 label="Confirm Password"
                                 placeholder="Confirm Password"
-                                value={password}
-                                onInputChange={handlePasswordChange}
+                                value={confirmPassword}
+                                onInputChange={handleConfirmPasswordChange}
                                 require={true}
                                 isPassword={true}
                                 withBackground={false}
@@ -122,13 +117,13 @@ export default function Signup() {
                         <p className="mt-3 text-[#B7B3BF] text-[3.5vw] font-[400] text-right">Already have an account? <span className="text-primaryColor cursor-pointer hover:underline underline-offset-4" onClick={goToLogin}>Login</span></p>
                     </div>
                     <div>
-                        <AppButton 
-                        type="submit" 
-                        content="Next" 
-                        isDisabled={!isNameValid || !isEmailValid || !isPasswordValid} 
-                        isLoading={false}
-                        onClickButton={() => {}}
-                        isRounded={true} 
+                        <AppButton
+                            type="submit"
+                            content="Next"
+                            isDisabled={!isFirstNameValid || !isLastNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid || !passwordValidation}
+                            isLoading={isLoading}
+                            onClickButton={() => { }}
+                            isRounded={true}
                         />
                     </div>
                 </form>

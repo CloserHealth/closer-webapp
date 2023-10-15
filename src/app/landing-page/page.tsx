@@ -12,6 +12,12 @@ const LandingPage = () => {
     const goToSignup = () => {
         router.push('/signup');
     }
+
+     // Navigate to Login
+    const goToLogin = () => {
+        router.push('/login');
+    }
+
     return (
         <div className="px-5 pt-10 pb-20 min-h-[100vh] w-full bg-[#f9f9f9]">
             <div className="w-full flex justify-center items-center mx-auto">
@@ -32,7 +38,7 @@ const LandingPage = () => {
                 />
                 <OutlinedAppButton
                     content='Already have an account? Log In'
-                    onClickButton={() => { }}
+                    onClickButton={goToLogin}
                     isRounded={true}
                     isLoading={undefined}
                     type='button'
