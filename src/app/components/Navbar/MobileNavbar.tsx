@@ -35,7 +35,7 @@ const MobileNavbar = () => {
         {
             icon: Assets.task,
             title: 'Tasks',
-            route: '',
+            route: '/task',
         },
     ]
 

@@ -110,4 +110,10 @@ export function CsvDownloadButton({ content, onClickButton }: OutlinedButtonProp
     )
 }
 
+export function HeaderButton({text, onClickButton}: any) {
+    return (
+        <button onClick={onClickButton} className="border border-primaryColor rounded-full px-[16px] py-[8px] text-primaryColor text-[2.5vw] font-[500] leading-4">{text}</button>
+    )
+}
+
 
