@@ -58,9 +58,11 @@ import fever from '../app/assets/icons/fever.svg';
 import fatigue from '../app/assets/icons/fatigue.svg';
 import bloating from '../app/assets/icons/bloating.svg';
 import backPain from '../app/assets/icons/back-pain.svg';
+import cat from '../app/assets/icons/cat.svg';
 
 
 const Assets = {
+  cat,
   dotMenu,
   menstrual,
   headache,

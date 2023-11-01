@@ -70,14 +70,14 @@ export default function Symptoms() {
         },
     ];
 
-     // menu
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleMenuOpen = (event: any) => {
-    setAnchorEl(event.currentTarget);
-    event.stopPropagation();
-  };
-  const handleMenuClose = () => setAnchorEl(null);
+    // menu
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleMenuOpen = (event: any) => {
+        setAnchorEl(event.currentTarget);
+        event.stopPropagation();
+    };
+    const handleMenuClose = () => setAnchorEl(null);
 
     return (
         <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full'>
@@ -94,28 +94,39 @@ export default function Symptoms() {
 
                 {/* Menu */}
                 <>
-                  <UserMenu
-                    open={open}
-                    anchorEl={anchorEl}
-                    handleClose={handleMenuClose}
-                    onDelete={() => {}}
-                  />
+                    <UserMenu
+                        open={open}
+                        anchorEl={anchorEl}
+                        handleClose={handleMenuClose}
+                        onDelete={() => { }}
+                    />
                 </>
 
                 {/* Symptoms */}
-                <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
-                    {symptoms?.map((symptom, index) => (
-                        <div key={index} className="flex flex-col items-center space-y-2">
-                            <div
-                                className="flex justify-center items-center rounded-[12px] w-full h-[100px]"
-                                style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}
-                            >
-                                <Image src={symptom.icon} alt={symptom.title} width={50} height={50} />
-                            </div>
-                            <p className="font-[800] text-[2.8vw] text-primaryColor">{symptom.title}</p>
+                {symptoms?.length <= 0 ? (
+                    <div className="mt-7 w-full h-auto rounded-[16px] px-[20px] py-[28px]"
+                        style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
+                        <h1 className="text-[4.5vw] font-[600] text-white">Your Symptoms</h1>
+                        <div className="mt-5 flex items-center justify-between">
+                            <p className="text-[3vw] font-[400] text-white">Ooops! No symptoms found. Add your symptoms to get started.</p>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ) : (
+                    <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
+                        {symptoms?.map((symptom, index) => (
+                            <div key={index} className="flex flex-col items-center space-y-2">
+                                <div
+                                    className="flex justify-center items-center rounded-[12px] w-full h-[100px]"
+                                    style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}
+                                >
+                                    <Image src={symptom.icon} alt={symptom.title} width={50} height={50} />
+                                </div>
+                                <p className="font-[800] text-[2.8vw] text-primaryColor">{symptom.title}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
 
                 <div className="mt-10">
                     <SymptomTracker title="Track Symptom" subTitle="Menstrual Cramps" />
@@ -125,9 +136,17 @@ export default function Symptoms() {
                 <div className="mt-7 bg-[#F0EDF8] rounded-[16px] px-4 py-5 w-full h-auto" style={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
                     <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Coping Tips</h1>
                     <p className="text-[2.8vw] font-[400] text-[#1E1E1E] mt-1.5">Based on your symptoms, Closer suggests you do the following this week.</p>
-                    <div className="mt-5">
-                        <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
-                        <div className="w-full grid grid-cols-2 gap-x-10">
+                   
+                        
+                        {copingTips.length <= 0 ? (
+                            <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
+                                <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
+                                <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
+                            </div>
+                        ) : (
+                             <div className="mt-5">
+                            <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
+                            <div className="w-full grid grid-cols-2 gap-x-10">
                             {copingTips?.map((tip, index) => (
                                 <div key={index} className="flex items-center">
                                     <Checkbox
@@ -144,11 +163,14 @@ export default function Symptoms() {
                                 </div>
                             ))}
                         </div>
-                    </div>
+                        </div>
+                        )}
+                    
                 </div>
 
                 {/* Health Watch */}
-                <div className="mt-7">
+                {healthWatch.length > 0 && symptoms.length > 0 && (
+                    <div className="mt-7">
                     <div className="flex items-center justify-between">
                         <h1 className="text-[#17181C] font-[700] text-[4vw]">Health Watch</h1>
                         <p className="font-[400] text-[3vw] text-primaryColor">See all</p>
@@ -184,6 +206,7 @@ export default function Symptoms() {
                         ))}
                     </div>
                 </div>
+                )}
 
 
             </div>
