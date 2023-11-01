@@ -1,9 +1,12 @@
-import React from 'react'
+"use client"
+
+import React, { useState } from 'react'
 import MobileNavbar from '../components/Navbar/MobileNavbar';
 import Image from 'next/image';
 import { Checkbox, IconButton } from '@mui/material';
 import Assets from '@/constants/assets.constant';
 import SymptomTracker from '../components/SymptomTracker/SymptomTracker';
+import { UserMenu } from '../components/Menu/Menu';
 
 export default function Symptoms() {
     const symptoms = [
@@ -51,7 +54,7 @@ export default function Symptoms() {
             title: 'Eat Protein',
         },
         {
-            title: 'Laugh alot',
+            title: 'Laugh a lot',
         },
     ];
 
@@ -67,6 +70,15 @@ export default function Symptoms() {
         },
     ];
 
+     // menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleMenuOpen = (event: any) => {
+    setAnchorEl(event.currentTarget);
+    event.stopPropagation();
+  };
+  const handleMenuClose = () => setAnchorEl(null);
+
     return (
         <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full'>
             <div className="fixed top-0 right-0 left-0 z-50">
@@ -75,10 +87,20 @@ export default function Symptoms() {
             <div className='mt-28 w-full'>
                 <div className="flex justify-between items-center w-full">
                     <p className="font-[700] text-[3.8vw] text-[#17181C]">Symptoms</p>
-                    <IconButton>
+                    <IconButton onClick={handleMenuOpen}>
                         <Image src={Assets.dotMenu} alt="" width={6} height={6} />
                     </IconButton>
                 </div>
+
+                {/* Menu */}
+                <>
+                  <UserMenu
+                    open={open}
+                    anchorEl={anchorEl}
+                    handleClose={handleMenuClose}
+                    onDelete={() => {}}
+                  />
+                </>
 
                 {/* Symptoms */}
                 <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
@@ -131,7 +153,7 @@ export default function Symptoms() {
                         <h1 className="text-[#17181C] font-[700] text-[4vw]">Health Watch</h1>
                         <p className="font-[400] text-[3vw] text-primaryColor">See all</p>
                     </div>
-                    <div className="mt-3 grid grid-cols-2 gap-3">
+                    <div className="mt-3 grid grid-cols-2 gap-4">
                         {healthWatch?.map((item: any, index: React.Key | null | undefined) => (
                             <div
                                 key={index}
