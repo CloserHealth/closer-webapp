@@ -7,8 +7,10 @@ import { Checkbox, IconButton } from '@mui/material';
 import Assets from '@/constants/assets.constant';
 import SymptomTracker from '../components/SymptomTracker/SymptomTracker';
 import { UserMenu } from '../components/Menu/Menu';
+import { useRouter } from 'next/navigation';
 
 export default function Symptoms() {
+    const router = useRouter();
     const symptoms = [
         {
             icon: Assets.menstrual,
@@ -79,6 +81,10 @@ export default function Symptoms() {
     };
     const handleMenuClose = () => setAnchorEl(null);
 
+    const goToAddSymptom = () => {
+        router.push('symptoms/add');
+    }
+
     return (
         <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full'>
             <div className="fixed top-0 right-0 left-0 z-50">
@@ -99,6 +105,7 @@ export default function Symptoms() {
                         anchorEl={anchorEl}
                         handleClose={handleMenuClose}
                         onDelete={() => { }}
+                        onAdd={goToAddSymptom}
                     />
                 </>
 

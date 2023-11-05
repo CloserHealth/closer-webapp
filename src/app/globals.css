@@ -190,3 +190,13 @@
   color: white;
   box-shadow: 0px 1.43006px 2.86013px 0px rgba(23, 23, 23, 0.41), 0px 1.43006px 2.14509px 0px rgba(255, 255, 255, 0.25) inset, 0px -1.43006px 2.86013px 0px rgba(23, 23, 23, 0.25) inset;
 }
+
+
+/* Custom color classes */
+.selected-chip {
+  background-color: #FFD4ED;
+}
+
+.default-chip {
+  background-color: '#FFECC8';
+}

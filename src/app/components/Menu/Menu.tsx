@@ -5,11 +5,13 @@ export const UserMenu = ({
     open,
     handleClose,
     onDelete,
+    onAdd,
   }: {
     anchorEl: any;
     open: boolean;
     handleClose: any;
     onDelete: any;
+    onAdd: any;
   }) => {
     return (
       <Menu
@@ -34,7 +36,7 @@ export const UserMenu = ({
         anchorOrigin={{ horizontal: 'right', vertical: 'center' }}
       >
         <MenuItemItem
-          onClick={() => {}}
+          onClick={onAdd}
           icon={''}
           title="Add Symptom"
         />

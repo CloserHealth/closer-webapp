@@ -6,9 +6,15 @@ import Image from 'next/image';
 import { ButtonBase, Checkbox, IconButton } from '@mui/material';
 import Assets from '@/constants/assets.constant';
 import { HeaderButton } from '../components/Buttons/Buttons';
+import { useRouter } from 'next/navigation';
 
 export default function Task() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<boolean>(true);
+
+    const newTask = () => {
+        router.push('/task/new');
+    }
 
     // Check box
     const currentTask = [
@@ -38,7 +44,7 @@ export default function Task() {
             <div className='mt-28 w-full'>
                 <div className="flex justify-between items-center w-full">
                     <p className="font-[700] text-[3.8vw] text-[#17181C]">Task</p>
-                    <HeaderButton text="Set new task" onClickButton={() => { }} />
+                    <HeaderButton text="Set new task" onClickButton={newTask} />
                 </div>
 
                 <div className="w-full h-auto rounded-[16px] mt-7 px-[20px] py-[28px]"
