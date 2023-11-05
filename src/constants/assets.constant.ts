@@ -51,9 +51,25 @@ import home from '../app/assets/icons/home.svg';
 import navbarCalendar from '../app/assets/icons/navbar-calendar.svg';
 import symptoms from '../app/assets/icons/symptom.svg';
 import task from '../app/assets/icons/task.svg';
+import dotMenu from '../app/assets/icons/menu2.svg';
+import menstrual from '../app/assets/icons/menstrual.svg';
+import headache from '../app/assets/icons/headache.svg';
+import fever from '../app/assets/icons/fever.svg';
+import fatigue from '../app/assets/icons/fatigue.svg';
+import bloating from '../app/assets/icons/bloating.svg';
+import backPain from '../app/assets/icons/back-pain.svg';
+import cat from '../app/assets/icons/cat.svg';
 
 
 const Assets = {
+  cat,
+  dotMenu,
+  menstrual,
+  headache,
+  fever,
+  fatigue,
+  bloating,
+  backPain,
   task,
   symptoms,
   home,

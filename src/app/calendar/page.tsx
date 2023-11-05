@@ -9,6 +9,7 @@ import CustomCalendar from '../components/Calendar/Calendar';
 import API from '@/constants/api.constant';
 import useRequest from '@/services/request.service';
 import useGlobalState from '@/hooks/globalstate.hook';
+import { Checkbox, IconButton } from '@mui/material';
 
 const Calendar = () => {
     const { profile } = useGlobalState();
@@ -18,27 +19,45 @@ const Calendar = () => {
     const [selectRange, setSelectRange] = useState<any>(true);
     const [date, setDate] = useState(new Date());
 
+    // Check box
+    const copingTips = [
+        {
+            title: 'Walk 1000 steps',
+        },
+        {
+            title: 'Sleep 8hours',
+        },
+        {
+            title: 'Drink 5litres of water',
+        },
+        {
+            title: 'Go to the gym',
+        },
+        {
+            title: 'Eat Protein',
+        },
+        {
+            title: 'Laugh a lot',
+        },
+    ];
+
     // phases
     const phases = [
         {
             icon: Assets.follicularPhase,
             title: 'Follicular Phase',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id malesuada augue neque tortor tellus pellentesque est, in ipsum. Nunc vitae donec augue non  pellentesque est, in ipsum. Nunc vitae donec Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id malesuada augue neque tortor tellus pellentesque est, in ipsum. Nunc vitae donec augue non  pellentesque est, in ipsum. Nunc vitae donec'
         },
         {
             icon: Assets.lutealPhase,
             title: 'Luteal Phase',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id malesuada augue neque tortor tellus pellentesque est, in ipsum. Nunc vitae donec augue non  pellentesque est, in ipsum. Nunc vitae donec Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id malesuada augue neque tortor tellus pellentesque est, in ipsum. Nunc vitae donec augue non  pellentesque est, in ipsum. Nunc vitae donec'
         },
         {
             icon: Assets.ovulationPhase,
             title: 'Ovulation Phase',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id malesuada augue neque tortor tellus pellentesque est, in ipsum. Nunc vitae donec augue non  pellentesque est, in ipsum. Nunc vitae donec Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id malesuada augue neque tortor tellus pellentesque est, in ipsum. Nunc vitae donec augue non  pellentesque est, in ipsum. Nunc vitae donec'
         },
         {
             icon: Assets.periodPhase,
             title: 'Period Phase',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id malesuada augue neque tortor tellus pellentesque est, in ipsum. Nunc vitae donec augue non  pellentesque est, in ipsum. Nunc vitae donec Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id malesuada augue neque tortor tellus pellentesque est, in ipsum. Nunc vitae donec augue non  pellentesque est, in ipsum. Nunc vitae donec'
         },
     ];
 
@@ -134,49 +153,98 @@ const Calendar = () => {
                 </div>
 
                 {/* Calendar */}
-                    <CustomCalendar
-                        date={date}
-                        setDate={setDate}
-                        selectRange={false}
-                        setSelectRange={setSelectRange}
-                        periodStartDate={periodStartDate}
-                        periodEndDate={periodEndDate}
-                        tileContent={tileContent}
-                    />
+                <CustomCalendar
+                    date={date}
+                    setDate={setDate}
+                    selectRange={false}
+                    setSelectRange={setSelectRange}
+                    periodStartDate={periodStartDate}
+                    periodEndDate={periodEndDate}
+                    tileContent={tileContent}
+                />
 
-                <div className="mt-7 grid grid-cols-1 gap-y-5">
-                    {/* {phases.map((item, i) => (
-                        <div key={i} className="w-full h-auto rounded-[16px] px-[10px] py-[29px]"
-                            style={{ background: '#594D94', boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
-                            <div className="flex space-x-2 items-center">
-                                <h1 className="text-[4.5vw] font-[800] text-white">{item.title}</h1>
+
+                <div className="mt-7 grid grid-cols-2 gap-y-5 bg-white rounded-[16px] p-4 border">
+                    {phases.map((item, i) => (
+                        <div key={i} className="w-full">
+                            <div className="flex space-x-2 items-center w-full">
                                 <Image src={item.icon} alt='' width={20} height={20} />
+                                <h1 className="text-[3vw] font-[500] text-black w-full">{item.title}</h1>
                             </div>
-                            <p className="text-[3.5vw] font-[400] text-white mt-7">{item.content}</p>
                         </div>
-                    ))} */}
-                    <div className="w-full h-auto rounded-[16px] px-[10px] py-[29px]"
-                        style={{ background: '#594D94', boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
-                        <div className="flex space-x-2 items-center">
-                            <h1 className="text-[4.5vw] font-[800] text-white">{phase?.name} Phase</h1>
-                            <Image
-                                src={
-                                    phase?.name === 'Follicular' ? Assets.follicularPhase :
-                                        phase?.name === 'Luteal' ? Assets.lutealPhase : phase?.name === 'Ovulation' ? Assets.ovulationPhase :
-                                            Assets.periodPhase
-                                }
-                                alt=''
-                                width={20}
-                                height={20}
-                            />
-                        </div>
-                        <div className="mt-5 space-y-3">
-                            {phase?.tips?.map((tip: any, i: any) => (
-                                <p key={i} className="text-[3.5vw] font-[400] text-white">{i + 1}: {tip}</p>
-                            ))}
-                        </div>
-                    </div>
+                    ))}
                 </div>
+
+                {/* Task for the day */}
+                <div className="mt-7 bg-[#F0EDF8] rounded-[16px] px-4 py-5 w-full h-auto" style={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
+                    <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task for today</h1>
+
+                    {copingTips.length <= 0 ? (
+                        <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
+                            <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
+                            <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
+                        </div>
+                    ) : (
+                        <div className="mt-5">
+                            <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
+                            <div className="w-full grid grid-cols-2 gap-x-10">
+                                {copingTips?.map((tip, index) => (
+                                    <div key={index} className="flex items-center">
+                                        <Checkbox
+                                            size="small"
+                                            className="-translate-x-3"
+                                            sx={{
+                                                color: '#939393',
+                                                '&.Mui-checked': {
+                                                    color: '#392768',
+                                                },
+                                            }}
+                                        />
+                                        <p className="text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3">{tip.title}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+
+
+                {/* Coping Tips */}
+                <div className="mt-7 bg-[#F0EDF8] rounded-[16px] px-4 py-5 w-full h-auto" style={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
+                    <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Coping Tips</h1>
+                    <p className="text-[2.8vw] font-[400] text-[#1E1E1E] mt-1.5">Based on your symptoms, Closer suggests you do the following this week.</p>
+
+
+                    {copingTips.length <= 0 ? (
+                        <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
+                            <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
+                            <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
+                        </div>
+                    ) : (
+                        <div className="mt-5">
+                            <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
+                            <div className="w-full grid grid-cols-2 gap-x-10">
+                                {copingTips?.map((tip, index) => (
+                                    <div key={index} className="flex items-center">
+                                        <Checkbox
+                                            size="small"
+                                            className="-translate-x-3"
+                                            sx={{
+                                                color: '#939393',
+                                                '&.Mui-checked': {
+                                                    color: '#392768',
+                                                },
+                                            }}
+                                        />
+                                        <p className="text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3">{tip.title}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
             </div>
         </div>
     )

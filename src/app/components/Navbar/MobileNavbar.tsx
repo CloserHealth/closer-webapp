@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Assets from '@/constants/assets.constant';
@@ -28,12 +30,12 @@ const MobileNavbar = () => {
         {
             icon: Assets.symptoms,
             title: 'Symptoms',
-            route: '',
+            route: '/symptoms',
         },
         {
             icon: Assets.task,
             title: 'Tasks',
-            route: '',
+            route: '/task',
         },
     ]
 
