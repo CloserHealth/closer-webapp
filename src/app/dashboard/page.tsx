@@ -152,15 +152,15 @@ const Dashboard = () => {
       const day = `${d.getDate()}`.padStart(2, '0');
       return `${year}-${month}-${day}`;
     };
-  
+
     if (view === 'month') {
       const dateStr = formatDate(date);
-  
+
       const formattedPeriodStartDate = formatDate(new Date(periodStartDate));
       const formattedPeriodEndDate = formatDate(new Date(periodEndDate));
       const formattedOvulationStartDate = formatDate(new Date(ovulationStartDate));
       const formattedOvulationEndDate = formatDate(new Date(ovulationEndDate));
-  
+
       if (dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
         return (
           <div className="period-date-marker">
@@ -186,7 +186,7 @@ const Dashboard = () => {
     }
     return null;
   };
-  
+
 
 
 
@@ -195,7 +195,7 @@ const Dashboard = () => {
       {!isUser ? (
         <SplashScreen />
       ) : (
-        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto'>
+        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto bg-white'>
           <div className="fixed top-0 right-0 left-0 z-50">
             <MobileNavbar />
           </div>
@@ -220,7 +220,30 @@ const Dashboard = () => {
               tileContent={tileContent}
             />
 
-            <div className="w-full h-auto rounded-[16px] mt-7 px-[10px] py-[29px]"
+            <div className="flex space-x-5 items-center mt-10">
+              <div className="w-full h-auto px-[19px] py-[27px] bg-violet-100 rounded-2xl shadow border-t border-neutral-200 justify-center items-center inline-flex">
+                <div className="self-stretch flex-col justify-start items-center gap-[3px] inline-flex">
+                  <div className="justify-start items-center inline-flex">
+                    <div className="text-stone-900 text-[3.5vw] font-semibold font-['Manrope'] leading-normal">Period</div>
+                    <div className="w-4 h-4 relative" />
+                  </div>
+                  <div className="text-stone-900 text-[3vw] font-normal font-['Montserrat'] leading-[18px] text-center">{periodLeftDays} days left: {formattedPeriodDate}</div>
+                </div>
+              </div>
+
+              <div className="w-full h-auto px-[19px] py-[27px] bg-violet-100 rounded-2xl shadow border-t border-neutral-200 justify-center items-center inline-flex">
+                <div className="self-stretch flex-col justify-start items-center gap-[3px] inline-flex">
+                  <div className="justify-start items-center inline-flex">
+                    <div className="text-stone-900 text-[3.5vw] font-semibold font-['Manrope'] leading-normal">Ovulation</div>
+                    <div className="w-4 h-4 relative" />
+                  </div>
+                  <div className="text-stone-900 text-[3vw] font-normal font-['Montserrat'] leading-[18px] text-center">{ovulationLeftDays} days left: {formattedOvulationDate}</div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* <div className="w-full h-auto rounded-[16px] mt-7 px-[10px] py-[29px]"
               style={{ background: '#C8B7FA', boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
               <h1 className="text-[3.7vw] font-[600] text-[#1E1E1E]">Cycle Prediction</h1>
               <div className="mt-7 flex space-x-7 items-center">
@@ -233,7 +256,7 @@ const Dashboard = () => {
                   <p className="text-[#1E1E1E] text-[3vw] font-[400]">{ovulationLeftDays} days left: {formattedOvulationDate}</p>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* <div className="w-full h-auto rounded-[16px] mt-7 px-[10px] py-[20px]"
           style={{ 

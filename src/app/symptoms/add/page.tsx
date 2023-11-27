@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Assets from '@/constants/assets.constant';
@@ -8,97 +8,62 @@ import { AppButton } from '@/app/components/Buttons/Buttons';
 import { AppModal } from '@/app/components/Modals/Modals';
 import useRequest from '@/services/request.service';
 import SymptomsCategory from '@/app/components/SymptomsCategory/SymptomsCategory';
+import API from '@/constants/api.constant';
 
 
 export default function AddSymptom() {
     const router = useRouter();
     const { isLoading, makeRequest } = useRequest();
     const [openModal, setOpenModal] = useState<boolean>(false);
+    const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
+    const { makeRequest: makeUserSymptomRequest, isLoading: isLoadingUserSymptom } = useRequest();
+    const [allSymptoms, setAllSymptoms] = useState<any[]>([]);
+    const [selectedChips, setSelectedChips] = useState<{ id: string; category: string; phase: string }[]>([]);
+    const [selectedPhase, setSelectedPhase] = useState<string>('');
 
-
-
-    const handleOpenModal = () => {
-        setOpenModal(true);
-    }
-    const handleCloseModal = () => {
-        setOpenModal(false);
-    }
 
     const goBack = () => {
         router.back();
     };
 
+    // Get Symptoms
+    useEffect(() => {
+        const fetchSymptoms = async () => {
+            try {
+                const res = await makeSymptomRequest({
+                    url: API.symptom + '?include=tips',
+                    method: 'GET',
+                });
+                const { status, data } = res.data;
+                setAllSymptoms(data?.symptoms);
+            } catch (e: any) {
+                console.log(e);
+            }
+        };
 
-    const handleClick = () => {
-        console.info('You clicked the Chip.');
+        fetchSymptoms();
+    }, []);
+
+
+    const handleSaveToLocalStorage = () => {
+        const beforePeriodSymptoms = selectedChips
+            .filter((chip) => chip.category === 'Before Period')
+            .map((chip) => chip.id);
+        const duringPeriodSymptoms = selectedChips
+            .filter((chip) => chip.category === 'During Period')
+            .map((chip) => chip.id);
+        const afterPeriodSymptoms = selectedChips
+            .filter((chip) => chip.category === 'After Period')
+            .map((chip) => chip.id);
+
+        // Save data to localStorage
+        localStorage.setItem('beforePeriodSymptoms', JSON.stringify(beforePeriodSymptoms));
+        localStorage.setItem('duringPeriodSymptoms', JSON.stringify(duringPeriodSymptoms));
+        localStorage.setItem('afterPeriodSymptoms', JSON.stringify(afterPeriodSymptoms));
+
+        router.push('/symptoms/add/new');
     };
 
-    const handleDelete = () => {
-        console.info('You clicked the delete icon.');
-    };
-
-    const experienceBeforePeriod = [
-        {
-            label: 'Headache',
-        },
-        {
-            label: 'Bloating',
-        },
-         {
-            label: 'Weakness',
-        },
-         {
-            label: 'Nausea',
-        },
-         {
-            label: 'Dizziness',
-        },
-         {
-            label: 'Other',
-        },
-    ];
-
-    const experienceDuringPeriod = [
-        {
-            label: 'Headache',
-        },
-        {
-            label: 'Bloating',
-        },
-         {
-            label: 'Weakness',
-        },
-         {
-            label: 'Nausea',
-        },
-         {
-            label: 'Dizziness',
-        },
-         {
-            label: 'Other',
-        },
-    ];
-
-    const experienceAfterPeriod = [
-        {
-            label: 'Headache',
-        },
-        {
-            label: 'Bloating',
-        },
-         {
-            label: 'Weakness',
-        },
-         {
-            label: 'Nausea',
-        },
-         {
-            label: 'Dizziness',
-        },
-         {
-            label: 'Other',
-        },
-    ];
 
 
     return (
@@ -116,9 +81,9 @@ export default function AddSymptom() {
                     <p className="text-[#17181C] text-[4vw] font-[400]">What symptoms do you experience during the following phases?</p>
 
                     <div className="mt-5 space-y-10">
-                        <SymptomsCategory phase="Before Period" experience={experienceBeforePeriod} />
-                        <SymptomsCategory phase="During Period" experience={experienceDuringPeriod} />
-                        <SymptomsCategory phase="After Period" experience={experienceAfterPeriod} />
+                        <SymptomsCategory phase="Before Period" experience={allSymptoms} setSelectedChips={setSelectedChips} selectedChips={selectedChips} setSelectedPhase={setSelectedPhase} />
+                        <SymptomsCategory phase="During Period" experience={allSymptoms} setSelectedChips={setSelectedChips} selectedChips={selectedChips} setSelectedPhase={setSelectedPhase} />
+                        <SymptomsCategory phase="After Period" experience={allSymptoms} setSelectedChips={setSelectedChips} selectedChips={selectedChips} setSelectedPhase={setSelectedPhase} />
                     </div>
 
                     <div>
@@ -127,22 +92,13 @@ export default function AddSymptom() {
                             content="Save"
                             isDisabled={false}
                             isLoading={false}
-                            onClickButton={() => { }}
+                            onClickButton={handleSaveToLocalStorage}
                             isRounded={true}
                         />
+
                     </div>
                 </div>
             </div>
-
-            {openModal && (
-                <AppModal
-                    header="Symptom Added successful!"
-                    text="Your symptom has been added successfully."
-                    buttonText="Continue"
-                    onClick={() => { }}
-                    onClose={handleCloseModal}
-                />
-            )}
         </>
     )
 }

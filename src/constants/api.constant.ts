@@ -39,6 +39,9 @@ export const API = {
 
   // Projects
   getProjects: '/admin/projects',
+
+  symptom: '/symptoms',
+  userSymptom: '/user-symptoms',
 };
 
 export default API;
