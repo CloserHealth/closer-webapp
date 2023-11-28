@@ -43,6 +43,7 @@ export const API = {
   symptom: '/symptoms',
   userSymptom: '/user-symptoms',
   userTask: '/user-tasks',
+  period: '/periods/log',
 };
 
 export default API;

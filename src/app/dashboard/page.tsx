@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [periodLeftDays, setPeriodLeftDays] = useState<any>(0);
   const [ovulationLeftDays, setOvulationLeftDays] = useState<any>(0);
   const [weeklyTasks, setWeeklyTasks] = useState<any[]>([]);
+  const [phase, setPhase] = useState<any>({});
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -49,6 +50,7 @@ const Dashboard = () => {
 
       if (message === "Data fetched successfully!") {
         setPeriodLog(data?.period_log);
+        setPhase(data?.phase);
       }
     } catch (err) {
       console.log("Error fetching users:", err);
@@ -154,7 +156,7 @@ const Dashboard = () => {
       const formattedOvulationStartDate = formatDate(new Date(ovulationStartDate));
       const formattedOvulationEndDate = formatDate(new Date(ovulationEndDate));
 
-      if (profile?.data?.user?.phase?.name === undefined ? dateStr >= formattedNextPeriodStartDate && dateStr <= formattedNextPeriodEndDate : dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
+      if (phase?.name === undefined ? dateStr >= formattedNextPeriodStartDate && dateStr <= formattedNextPeriodEndDate : dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
         return (
           <div className="period-date-marker">
             <span className="period-date-text absolute">
@@ -209,6 +211,10 @@ const Dashboard = () => {
     router.push('/task/new');
   }
 
+  const goToLogPeriod = () => {
+    router.push('/period-log');
+  }
+
 
   return (
     <>
@@ -225,10 +231,17 @@ const Dashboard = () => {
               style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
               <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
               <div className="mt-7 flex items-center justify-between">
-                {profile?.data?.user?.phase?.name === undefined ? (
-                  <p className="text-[3.5vw] font-[400] text-white">{profile?.data?.user?.phase} 🩸</p>
+                {phase?.name === undefined ? (
+                 <div className="space-y-2">
+                   <p className="text-[3.5vw] font-[400] text-white">{phase} 🩸</p>
+                  <button
+                  onClick={goToLogPeriod}
+                  className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
+                  Log Period
+                </button>
+                 </div>
                 ) : (
-                  <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{profile?.data?.user?.phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
+                  <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
                 )}
 
               </div>
@@ -280,7 +293,9 @@ const Dashboard = () => {
                 <h1 className="text-[3.7vw] font-[600] text-white">This Week’s Tasks</h1>
                 <button
                   onClick={createTask}
-                  className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">Plan task</button>
+                  className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
+                  Plan task
+                </button>
               </div>
 
               {weeklyTasks?.length <= 0 ? (
