@@ -18,6 +18,27 @@ const Calendar = () => {
     const [phase, setPhase] = useState<any>([]);
     const [selectRange, setSelectRange] = useState<any>(true);
     const [date, setDate] = useState(new Date());
+    const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
+    const [allSymptoms, setAllSymptoms] = useState<any[]>([]);
+
+
+    // Get Symptoms
+    useEffect(() => {
+        const fetchSymptoms = async () => {
+            try {
+                const res = await makeSymptomRequest({
+                    url: API.symptom + '?include=tips',
+                    method: 'GET',
+                });
+                const { status, data } = res.data;
+                setAllSymptoms(data?.symptoms);
+            } catch (e: any) {
+                console.log(e);
+            }
+        };
+
+        fetchSymptoms();
+    }, []);
 
     // Check box
     const copingTips = [
@@ -137,8 +158,80 @@ const Calendar = () => {
     };
 
 
+    // Create an object to store tips based on symptom names
+    const [tipsBySymptom, setTipsBySymptom] = useState<{ [key: string]: any[] }>({});
+    const [checkedStates, setCheckedStates] = useState<{ [key: string]: boolean }>({});
+
+    useEffect(() => {
+        // Organize tips based on symptom names
+        const tips: { [key: string]: any[] } = {};
+        allSymptoms?.forEach((symptom: any) => {
+            if (symptom?.name && symptom?.tips) {
+                tips[symptom.name] = symptom?.tips;
+            }
+        });
+        setTipsBySymptom(tips);
+    }, [allSymptoms]);
+
+    useEffect(() => {
+        // Initialize checked states once tipsBySymptom is set
+        const initialCheckedStates: { [key: string]: boolean } = {};
+        Object.keys(tipsBySymptom).forEach((symptomName) => {
+            tipsBySymptom[symptomName].forEach((_, tipIndex) => {
+                initialCheckedStates[`${symptomName}-${tipIndex}`] = false;
+            });
+        });
+        setCheckedStates(initialCheckedStates);
+    }, [tipsBySymptom]);
+
+    const handleCheckboxChange = (symptomName: string, tipIndex: number) => {
+        setCheckedStates((prevCheckedStates) => ({
+            ...prevCheckedStates,
+            [`${symptomName}-${tipIndex}`]: !prevCheckedStates[`${symptomName}-${tipIndex}`],
+        }));
+    };
+
+
+    // Render tips based on symptom names
+    const TipsBySymptom = () => {
+        return (
+            <div>
+                {Object.keys(tipsBySymptom).map((symptomName, index) => (
+                    <div key={index} className="mt-3">
+                        <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptomName}</h3>
+                        <div className="w-full grid grid-cols-2 gap-x-10">
+                            {tipsBySymptom[symptomName].map((tip: any, tipIndex: number) => (
+                                <div key={tipIndex} className="flex items-center">
+                                    <Checkbox
+                                        size="small"
+                                        className="-translate-x-3"
+                                        checked={checkedStates[`${symptomName}-${tipIndex}`]}
+                                        onChange={() => handleCheckboxChange(symptomName, tipIndex)}
+                                        sx={{
+                                            color: '#939393',
+                                            '&.Mui-checked': {
+                                                color: '#392768',
+                                            },
+                                        }}
+                                    />
+                                    <p
+                                        className={`text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3 ${checkedStates[`${symptomName}-${tipIndex}`] ? 'line-through' : ''
+                                            }`}
+                                    >
+                                        {tip?.name}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
+
     return (
-        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto'>
+        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto bg-white'>
             <div className="fixed top-0 right-0 left-0 z-50">
                 <MobileNavbar />
             </div>
@@ -148,7 +241,11 @@ const Calendar = () => {
                     style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
                     <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
                     <div className="mt-7 flex items-center justify-between">
-                        <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
+                        {profile?.data?.user?.phase?.name === undefined ? (
+                            <p className="text-[3.5vw] font-[400] text-white">{profile?.data?.user?.phase} 🩸</p>
+                        ) : (
+                            <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{profile?.data?.user?.phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
+                        )}
                     </div>
                 </div>
 
@@ -179,7 +276,12 @@ const Calendar = () => {
                 <div className="mt-7 bg-[#F0EDF8] rounded-[16px] px-4 py-5 w-full h-auto" style={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
                     <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task for today</h1>
 
-                    {copingTips.length <= 0 ? (
+                    <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
+                        <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
+                        <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
+                    </div>
+
+                    {/* {copingTips.length <= 0 ? (
                         <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
                             <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
                             <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
@@ -205,7 +307,7 @@ const Calendar = () => {
                                 ))}
                             </div>
                         </div>
-                    )}
+                    )} */}
 
                 </div>
 
@@ -216,7 +318,7 @@ const Calendar = () => {
                     <p className="text-[2.8vw] font-[400] text-[#1E1E1E] mt-1.5">Based on your symptoms, Closer suggests you do the following this week.</p>
 
 
-                    {copingTips.length <= 0 ? (
+                    {allSymptoms?.length <= 0 ? (
                         <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
                             <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
                             <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
@@ -224,22 +326,8 @@ const Calendar = () => {
                     ) : (
                         <div className="mt-5">
                             <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
-                            <div className="w-full grid grid-cols-2 gap-x-10">
-                                {copingTips?.map((tip, index) => (
-                                    <div key={index} className="flex items-center">
-                                        <Checkbox
-                                            size="small"
-                                            className="-translate-x-3"
-                                            sx={{
-                                                color: '#939393',
-                                                '&.Mui-checked': {
-                                                    color: '#392768',
-                                                },
-                                            }}
-                                        />
-                                        <p className="text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3">{tip.title}</p>
-                                    </div>
-                                ))}
+                            <div className="w-full mt-5">
+                                <TipsBySymptom />
                             </div>
                         </div>
                     )}

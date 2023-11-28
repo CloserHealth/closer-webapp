@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MobileNavbar from '../components/Navbar/MobileNavbar';
 import Image from 'next/image';
 import { Checkbox, IconButton } from '@mui/material';
@@ -8,8 +8,14 @@ import Assets from '@/constants/assets.constant';
 import SymptomTracker from '../components/SymptomTracker/SymptomTracker';
 import { UserMenu } from '../components/Menu/Menu';
 import { useRouter } from 'next/navigation';
+import API from '@/constants/api.constant';
+import useRequest from '@/services/request.service';
 
 export default function Symptoms() {
+    const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
+    const [allSymptoms, setAllSymptoms] = useState<any[]>([]);
+
+
     const router = useRouter();
     const symptoms = [
         {
@@ -38,27 +44,6 @@ export default function Symptoms() {
         },
     ];
 
-    // Check box
-    const copingTips = [
-        {
-            title: 'Walk 1000 steps',
-        },
-        {
-            title: 'Sleep 8hours',
-        },
-        {
-            title: 'Drink 5litres of water',
-        },
-        {
-            title: 'Go to the gym',
-        },
-        {
-            title: 'Eat Protein',
-        },
-        {
-            title: 'Laugh a lot',
-        },
-    ];
 
     // Health Watch
     const healthWatch: any = [
@@ -85,8 +70,106 @@ export default function Symptoms() {
         router.push('symptoms/add');
     }
 
+
+    // Get Symptoms
+    useEffect(() => {
+        const fetchSymptoms = async () => {
+            try {
+                const res = await makeSymptomRequest({
+                    url: API.symptom + '?include=tips',
+                    method: 'GET',
+                });
+                const { status, data } = res.data;
+                setAllSymptoms(data?.symptoms);
+            } catch (e: any) {
+                console.log(e);
+            }
+        };
+
+        fetchSymptoms();
+    }, []);
+
+
+
+
+
+
+// Create an object to store tips based on symptom names
+const [tipsBySymptom, setTipsBySymptom] = useState<{ [key: string]: any[] }>({});
+  const [checkedStates, setCheckedStates] = useState<{ [key: string]: boolean }>({});
+
+  useEffect(() => {
+    // Organize tips based on symptom names
+    const tips: { [key: string]: any[] } = {};
+    allSymptoms?.forEach((symptom: any) => {
+      if (symptom?.name && symptom?.tips) {
+        tips[symptom.name] = symptom?.tips;
+      }
+    });
+    setTipsBySymptom(tips);
+  }, [allSymptoms]);
+
+  useEffect(() => {
+    // Initialize checked states once tipsBySymptom is set
+    const initialCheckedStates: { [key: string]: boolean } = {};
+    Object.keys(tipsBySymptom).forEach((symptomName) => {
+      tipsBySymptom[symptomName].forEach((_, tipIndex) => {
+        initialCheckedStates[`${symptomName}-${tipIndex}`] = false;
+      });
+    });
+    setCheckedStates(initialCheckedStates);
+  }, [tipsBySymptom]);
+
+  const handleCheckboxChange = (symptomName: string, tipIndex: number) => {
+    setCheckedStates((prevCheckedStates) => ({
+      ...prevCheckedStates,
+      [`${symptomName}-${tipIndex}`]: !prevCheckedStates[`${symptomName}-${tipIndex}`],
+    }));
+  };
+  
+  
+// Render tips based on symptom names
+const TipsBySymptom = () => {
+  return (
+    <div>
+      {Object.keys(tipsBySymptom).map((symptomName, index) => (
+        <div key={index} className="mt-3">
+          <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptomName}</h3>
+          <div className="w-full grid grid-cols-2 gap-x-10">
+            {tipsBySymptom[symptomName].map((tip: any, tipIndex: number) => (
+              <div key={tipIndex} className="flex items-center">
+                <Checkbox
+                  size="small"
+                  className="-translate-x-3"
+                  checked={checkedStates[`${symptomName}-${tipIndex}`]}
+                  onChange={() => handleCheckboxChange(symptomName, tipIndex)}
+                  sx={{
+                    color: '#939393',
+                    '&.Mui-checked': {
+                      color: '#392768',
+                    },
+                  }}
+                />
+                <p
+                  className={`text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3 ${
+                    checkedStates[`${symptomName}-${tipIndex}`] ? 'line-through' : ''
+                  }`}
+                >
+                  {tip?.name}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+
+
     return (
-        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full'>
+        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full bg-white'>
             <div className="fixed top-0 right-0 left-0 z-50">
                 <MobileNavbar />
             </div>
@@ -110,7 +193,7 @@ export default function Symptoms() {
                 </>
 
                 {/* Symptoms */}
-                {symptoms?.length <= 0 ? (
+                {allSymptoms?.length <= 0 ? (
                     <div className="mt-7 w-full h-auto rounded-[16px] px-[20px] py-[28px]"
                         style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
                         <h1 className="text-[4.5vw] font-[600] text-white">Your Symptoms</h1>
@@ -120,99 +203,85 @@ export default function Symptoms() {
                     </div>
                 ) : (
                     <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
-                        {symptoms?.map((symptom, index) => (
+                        {allSymptoms?.map((symptom, index) => (
                             <div key={index} className="flex flex-col items-center space-y-2">
                                 <div
                                     className="flex justify-center items-center rounded-[12px] w-full h-[100px]"
                                     style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}
                                 >
-                                    <Image src={symptom.icon} alt={symptom.title} width={50} height={50} />
+                                    <Image src={symptom?.image} alt={symptom?.name} width={50} height={50} />
                                 </div>
-                                <p className="font-[800] text-[2.8vw] text-primaryColor">{symptom.title}</p>
+                                <p className="font-[800] text-[2.8vw] text-primaryColor">{symptom?.name}</p>
                             </div>
                         ))}
                     </div>
                 )}
 
 
-                <div className="mt-10">
+                {/* <div className="mt-10">
                     <SymptomTracker title="Track Symptom" subTitle="Menstrual Cramps" />
-                </div>
+                </div> */}
 
                 {/* Coping Tips */}
                 <div className="mt-7 bg-[#F0EDF8] rounded-[16px] px-4 py-5 w-full h-auto" style={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
                     <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Coping Tips</h1>
                     <p className="text-[2.8vw] font-[400] text-[#1E1E1E] mt-1.5">Based on your symptoms, Closer suggests you do the following this week.</p>
-                   
-                        
-                        {copingTips.length <= 0 ? (
-                            <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
-                                <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
-                                <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
-                            </div>
-                        ) : (
-                             <div className="mt-5">
+
+
+                    {allSymptoms?.length <= 0 ? (
+                        <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
+                            <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
+                            <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
+                        </div>
+                    ) : (
+                        <div className="mt-5">
                             <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
-                            <div className="w-full grid grid-cols-2 gap-x-10">
-                            {copingTips?.map((tip, index) => (
-                                <div key={index} className="flex items-center">
-                                    <Checkbox
-                                        size="small"
-                                        className="-translate-x-3"
-                                        sx={{
-                                            color: '#939393',
-                                            '&.Mui-checked': {
-                                                color: '#392768',
-                                            },
-                                        }}
-                                    />
-                                    <p className="text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3">{tip.title}</p>
-                                </div>
-                            ))}
+                            <div className="w-full mt-5">
+                                <TipsBySymptom />
+                            </div>
                         </div>
-                        </div>
-                        )}
-                    
+                    )}
+
                 </div>
 
                 {/* Health Watch */}
                 {healthWatch.length > 0 && symptoms.length > 0 && (
                     <div className="mt-7">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-[#17181C] font-[700] text-[4vw]">Health Watch</h1>
-                        <p className="font-[400] text-[3vw] text-primaryColor">See all</p>
-                    </div>
-                    <div className="mt-3 grid grid-cols-2 gap-4">
-                        {healthWatch?.map((item: any, index: React.Key | null | undefined) => (
-                            <div
-                                key={index}
-                                className="w-full h-[157px] rounded-[10px] px-3 py-4"
-                                style={{
-                                    backgroundImage: `url(${item.image})`,
-                                    backgroundSize: 'cover',  // Adjust to your needs
-                                    backgroundPosition: 'center',  // Adjust to your needs
-                                    position: 'relative',
-                                }}
-                            >
+                        <div className="flex items-center justify-between">
+                            <h1 className="text-[#17181C] font-[700] text-[4vw]">Health Watch</h1>
+                            <p className="font-[400] text-[3vw] text-primaryColor">See all</p>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-4">
+                            {healthWatch?.map((item: any, index: React.Key | null | undefined) => (
                                 <div
-                                    className="linear-overlay px-3 py-4"
+                                    key={index}
+                                    className="w-full h-[157px] rounded-[10px] px-3 py-4"
                                     style={{
-                                        background: 'linear-gradient(136deg, rgba(52, 2, 132, 0.70) 45.39%, rgba(43, 10, 96, 0.48) 98.89%)',
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        width: '100%',
-                                        height: '100%',
-                                        borderRadius: '10px',
+                                        backgroundImage: `url(${item.image})`,
+                                        backgroundSize: 'cover',  // Adjust to your needs
+                                        backgroundPosition: 'center',  // Adjust to your needs
+                                        position: 'relative',
                                     }}
                                 >
-                                    <p className="font-[700] text-white text-[3vw]">{item.title}</p>
+                                    <div
+                                        className="linear-overlay px-3 py-4"
+                                        style={{
+                                            background: 'linear-gradient(136deg, rgba(52, 2, 132, 0.70) 45.39%, rgba(43, 10, 96, 0.48) 98.89%)',
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                            borderRadius: '10px',
+                                        }}
+                                    >
+                                        <p className="font-[700] text-white text-[3vw]">{item.title}</p>
+                                    </div>
                                 </div>
-                            </div>
 
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
                 )}
 
 

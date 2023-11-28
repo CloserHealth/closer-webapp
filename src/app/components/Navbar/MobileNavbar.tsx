@@ -44,10 +44,14 @@ const MobileNavbar = () => {
         router.push('/');
     };
 
+    const home = () => {
+        router.push('/dashboard');
+    };
+
     return (
         <>
             <div className="px-5 h-[84px] flex items-center justify-between bg-white relative">
-                <Image src={Assets.closerLogo} alt="" width={130} height={100} />
+                <Image src={Assets.closerLogo} alt="" width={130} height={100} onClick={home} />
                 <IconButton onClick={() => setNavMenu(!navMenu)}>
                     <Image src={Assets.menu} alt="" width={25} height={25} />
                 </IconButton>

@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 function SplashScreen({ loading = false }: { loading?: boolean }) {
   return (
-    <div className="w-full h-[100vh] flex flex-col items-center justify-center">
+    <div className="w-full h-[100vh] flex flex-col items-center justify-center bg-white">
       <Image
         src={Assets.closerLogo}
         alt="logo"
