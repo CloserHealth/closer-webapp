@@ -185,7 +185,7 @@ const Calendar = () => {
             const formattedOvulationStartDate = formatDate(new Date(ovulationStartDate));
             const formattedOvulationEndDate = formatDate(new Date(ovulationEndDate));
 
-            if (profile?.data?.user?.phase?.name === undefined ? dateStr >= formattedNextPeriodStartDate && dateStr <= formattedNextPeriodEndDate : dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
+            if (phase?.name === undefined ? dateStr >= formattedNextPeriodStartDate && dateStr <= formattedNextPeriodEndDate : dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
                 return (
                     <div className="period-date-marker">
                         <span className="period-date-text absolute">
@@ -295,10 +295,10 @@ const Calendar = () => {
                     style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
                     <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
                     <div className="mt-7 flex items-center justify-between">
-                        {profile?.data?.user?.phase?.name === undefined ? (
-                            <p className="text-[3.5vw] font-[400] text-white">{profile?.data?.user?.phase} 🩸</p>
+                        {phase?.name === undefined ? (
+                            <p className="text-[3.5vw] font-[400] text-white">{phase} 🩸</p>
                         ) : (
-                            <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{profile?.data?.user?.phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
+                            <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
                         )}
                     </div>
                 </div>
