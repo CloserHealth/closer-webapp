@@ -11,8 +11,10 @@ import useRequest from '@/services/request.service';
 import useGlobalState from '@/hooks/globalstate.hook';
 import { Checkbox, IconButton } from '@mui/material';
 import toast from "react-hot-toast";
+import { useRouter } from 'next/navigation';
 
 const Calendar = () => {
+    const router = useRouter();
     const { profile } = useGlobalState();
     const { isLoading, makeRequest } = useRequest();
     const [periodLog, setPeriodLog] = useState<any>([]);
@@ -155,6 +157,10 @@ const Calendar = () => {
         fetchWeeklyTask();
     }, []);
 
+    const goToLogPeriod = () => {
+    router.push('/period-log');
+  }
+
 
 
     // Parse the start and end dates
@@ -296,7 +302,14 @@ const Calendar = () => {
                     <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
                     <div className="mt-7 flex items-center justify-between">
                         {phase?.name === undefined ? (
-                            <p className="text-[3.5vw] font-[400] text-white">{phase} 🩸</p>
+                            <div className="space-y-2">
+                                <p className="text-[3.5vw] font-[400] text-white">{phase} 🩸</p>
+                                <button
+                                    onClick={goToLogPeriod}
+                                    className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
+                                    Log Period
+                                </button>
+                            </div>
                         ) : (
                             <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
                         )}
