@@ -35,22 +35,6 @@ const Dashboard = () => {
     };
   }, []);
 
-  // tasks
-  const tasks = [
-    {
-      title: 'Call Ada'
-    },
-    {
-      title: 'Do my assignment'
-    },
-    {
-      title: 'Visit the gym'
-    },
-    {
-      title: 'Travel to europe'
-    },
-  ];
-
 
 
   // Fetch User management Data
@@ -143,6 +127,9 @@ const Dashboard = () => {
   const periodStartDate = periodLog?.prev_period?.start;
   const periodEndDate = periodLog?.prev_period?.end;
 
+  const nextPeriodStartDate = periodLog?.next_period?.start;
+  const nextPeriodEndDate = periodLog?.next_period?.end;
+
   const ovulationStartDate = periodLog?.prev_ovulation?.start;
   const ovulationEndDate = periodLog?.prev_ovulation?.end;
 
@@ -162,10 +149,12 @@ const Dashboard = () => {
 
       const formattedPeriodStartDate = formatDate(new Date(periodStartDate));
       const formattedPeriodEndDate = formatDate(new Date(periodEndDate));
+      const formattedNextPeriodStartDate = formatDate(new Date(nextPeriodStartDate));
+      const formattedNextPeriodEndDate = formatDate(new Date(nextPeriodEndDate));
       const formattedOvulationStartDate = formatDate(new Date(ovulationStartDate));
       const formattedOvulationEndDate = formatDate(new Date(ovulationEndDate));
 
-      if (dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
+      if (profile?.data?.user?.phase?.name === undefined ? dateStr >= formattedNextPeriodStartDate && dateStr <= formattedNextPeriodEndDate : dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
         return (
           <div className="period-date-marker">
             <span className="period-date-text absolute">
