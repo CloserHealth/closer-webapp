@@ -169,7 +169,7 @@ const TipsBySymptom = () => {
 
 
     return (
-        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full'>
+        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full bg-white'>
             <div className="fixed top-0 right-0 left-0 z-50">
                 <MobileNavbar />
             </div>

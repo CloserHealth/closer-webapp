@@ -5,6 +5,6 @@ module.exports = nextConfig
 
 module.exports = {
     images: {
-      domains: ['images.pexels.com', 's3-alpha-sig.figma.com', 'res.cloudinary.com'], // Add your image domains here
+      domains: ['res.cloudinary.com', 'images.pexels.com', 's3-alpha-sig.figma.com'], // Add your image domains here
     },
   };
