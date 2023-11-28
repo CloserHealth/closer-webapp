@@ -5,20 +5,25 @@ import MobileNavbar from '../components/Navbar/MobileNavbar';
 import 'react-minimal-progress-steps/dist/index.css';
 import CustomCalendar from '../components/Calendar/Calendar';
 import useGlobalState from '@/hooks/globalstate.hook';
-import { useRouter } from 'next/router';
 import SplashScreen from '../components/SplashScreen/SplashScreen';
 import API from '@/constants/api.constant';
 import useRequest from '@/services/request.service';
 import { calculateDaysLeft } from '@/helpers';
+import Image from 'next/image';
+import Assets from '@/constants/assets.constant';
+import { useRouter } from 'next/navigation';
 
 const Dashboard = () => {
+  const router = useRouter();
   const { profile, isAuthenticated } = useGlobalState();
+  const { makeRequest: makeTaskRequest, isLoading: isLoadingTask } = useRequest();
   const [isUser, setIsUser] = useState<boolean>(false);
   const [selectRange, setSelectRange] = useState<any>(true);
   const { isLoading, makeRequest } = useRequest();
   const [periodLog, setPeriodLog] = useState<any>([]);
   const [periodLeftDays, setPeriodLeftDays] = useState<any>(0);
   const [ovulationLeftDays, setOvulationLeftDays] = useState<any>(0);
+  const [weeklyTasks, setWeeklyTasks] = useState<any[]>([]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -57,7 +62,6 @@ const Dashboard = () => {
       });
 
       const { message, data } = res.data;
-      console.log(data)
 
       if (message === "Data fetched successfully!") {
         setPeriodLog(data?.period_log);
@@ -188,6 +192,33 @@ const Dashboard = () => {
   };
 
 
+  // Get Weekly Tasks
+  const fetchWeeklyTask = async () => {
+    try {
+      const res = await makeTaskRequest({
+        url: API.userTask + '?filter=week',
+        method: 'GET',
+      });
+      const { status, data } = res.data;
+
+      const allTasks = data?.tasks || [];
+
+      // Filter pending tasks from allTasks
+      const newTasks = allTasks?.filter((task: { status: string }) => task?.status === 'pending');
+
+      setWeeklyTasks(newTasks);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeeklyTask();
+  }, []);
+
+  const createTask = () => {
+    router.push('/task/new');
+  }
 
 
   return (
@@ -210,7 +241,7 @@ const Dashboard = () => {
                 ) : (
                   <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{profile?.data?.user?.phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
                 )}
-                
+
               </div>
             </div>
 
@@ -248,36 +279,37 @@ const Dashboard = () => {
 
             </div>
 
-            {/* <div className="w-full h-auto rounded-[16px] mt-7 px-[10px] py-[29px]"
-              style={{ background: '#C8B7FA', boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
-              <h1 className="text-[3.7vw] font-[600] text-[#1E1E1E]">Cycle Prediction</h1>
-              <div className="mt-7 flex space-x-7 items-center">
-                <div>
-                  <p className="text-[#1E1E1E] text-[4vw] font-[600]">Period</p>
-                  <p className="text-[#1E1E1E] text-[3vw] font-[400]">{periodLeftDays} days left: {formattedPeriodDate}</p>
-                </div>
-                <div>
-                  <p className="text-[#1E1E1E] text-[4vw] font-[600]">Ovulation</p>
-                  <p className="text-[#1E1E1E] text-[3vw] font-[400]">{ovulationLeftDays} days left: {formattedOvulationDate}</p>
-                </div>
-              </div>
-            </div> */}
 
-            {/* <div className="w-full h-auto rounded-[16px] mt-7 px-[10px] py-[20px]"
-          style={{ 
-            background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)',
-            boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)'
-             }}>
-          <div className="flex justify-between items-center">
-            <h1 className="text-[3.7vw] font-[600] text-white">This Week’s Tasks</h1>
-            <button className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">Plan task</button>
-          </div>
-          <div className="mt-7 grid grid-cols-2 gap-y-4">
-            {tasks.map((item, i) => (
-              <p key={i} className="text-[3.5vw] font-[400] text-white">{item.title}</p>
-            ))}
-          </div>
-        </div> */}
+
+
+            <div className="w-full h-auto rounded-[16px] mt-7 px-[10px] py-[20px]"
+              style={{
+                background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)',
+                boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)'
+              }}>
+              <div className="flex justify-between items-center">
+                <h1 className="text-[3.7vw] font-[600] text-white">This Week’s Tasks</h1>
+                <button
+                  onClick={createTask}
+                  className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">Plan task</button>
+              </div>
+
+              {weeklyTasks?.length <= 0 ? (
+                <div className="w-full flex flex-col justify-center items-center space-y-2 pb-7 mt-7">
+                  <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
+                  <p className="font-[600] text-[2.5vw] text-white">You’re yet to setup a task</p>
+                </div>
+              ) : (
+                <ul className="mt-7 grid grid-cols-2 gap-y-4">
+                  {weeklyTasks?.map((task, i) => (
+                    <li key={i} className="text-[3.2vw] font-[400] text-white">
+                      &bull; {task?.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+            </div>
 
             {/* <div className="w-full h-auto rounded-[16px] mt-7 px-[10px] py-[20px]"
           style={{ 

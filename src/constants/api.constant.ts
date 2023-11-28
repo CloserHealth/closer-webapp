@@ -42,6 +42,7 @@ export const API = {
 
   symptom: '/symptoms',
   userSymptom: '/user-symptoms',
+  userTask: '/user-tasks',
 };
 
 export default API;
