@@ -112,54 +112,57 @@ const Calendar = () => {
 
 
     // Complete a Task
-const handleTaskComplete = async (id: string) => {
-    try {
-      const res = await makeTaskRequest({
-        url: `${API.userTask}/${id}`,
-        method: 'PUT',
-      });
-      const { message, data } = res.data;
-  
-      toast.success(message);
-  
-      // Fetch updated task list after completion
-      fetchWeeklyTask(); // Call the function to fetch weekly tasks again
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  
+    const handleTaskComplete = async (id: string) => {
+        try {
+            const res = await makeTaskRequest({
+                url: `${API.userTask}/${id}`,
+                method: 'PUT',
+            });
+            const { message, data } = res.data;
+
+            toast.success(message);
+
+            // Fetch updated task list after completion
+            fetchWeeklyTask(); // Call the function to fetch weekly tasks again
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
 
 
     // Get Weekly Tasks
-  const fetchWeeklyTask = async () => {
-    try {
-      const res = await makeTaskRequest({
-        url: API.userTask + '?filter=week',
-        method: 'GET',
-      });
-      const { status, data } = res.data;
+    const fetchWeeklyTask = async () => {
+        try {
+            const res = await makeTaskRequest({
+                url: API.userTask + '?filter=week',
+                method: 'GET',
+            });
+            const { status, data } = res.data;
 
-      const allTasks = data?.tasks || [];
+            const allTasks = data?.tasks || [];
 
-      // Filter pending tasks from allTasks
-    //   const newTasks = allTasks?.filter((task: { status: string }) => task?.status === 'pending');
+            // Filter pending tasks from allTasks
+            //   const newTasks = allTasks?.filter((task: { status: string }) => task?.status === 'pending');
 
-      setWeeklyTasks(allTasks);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+            setWeeklyTasks(allTasks);
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
-  useEffect(() => {
-    fetchWeeklyTask();
-  }, []);
+    useEffect(() => {
+        fetchWeeklyTask();
+    }, []);
 
 
 
     // Parse the start and end dates
     const periodStartDate = periodLog?.prev_period?.start;
     const periodEndDate = periodLog?.prev_period?.end;
+
+    const nextPeriodStartDate = periodLog?.next_period?.start;
+    const nextPeriodEndDate = periodLog?.next_period?.end;
 
     const ovulationStartDate = periodLog?.prev_ovulation?.start;
     const ovulationEndDate = periodLog?.prev_ovulation?.end;
@@ -177,10 +180,12 @@ const handleTaskComplete = async (id: string) => {
 
             const formattedPeriodStartDate = formatDate(new Date(periodStartDate));
             const formattedPeriodEndDate = formatDate(new Date(periodEndDate));
+            const formattedNextPeriodStartDate = formatDate(new Date(nextPeriodStartDate));
+            const formattedNextPeriodEndDate = formatDate(new Date(nextPeriodEndDate));
             const formattedOvulationStartDate = formatDate(new Date(ovulationStartDate));
             const formattedOvulationEndDate = formatDate(new Date(ovulationEndDate));
 
-            if (dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
+            if (profile?.data?.user?.phase?.name === undefined ? dateStr >= formattedNextPeriodStartDate && dateStr <= formattedNextPeriodEndDate : dateStr >= formattedPeriodStartDate && dateStr <= formattedPeriodEndDate) {
                 return (
                     <div className="period-date-marker">
                         <span className="period-date-text absolute">
@@ -333,26 +338,26 @@ const handleTaskComplete = async (id: string) => {
                         <div className="mt-5">
                             <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
                             <div className="w-full grid grid-cols-2 gap-x-10">
-                                        {weeklyTasks?.map((task, index) => (
-                                            <div key={index} className="flex items-center">
-                                                <Checkbox
-                                                    size="small"
-                                                    className="-translate-x-3"
-                                                    sx={{
-                                                        color: '#939393',
-                                                        '&.Mui-checked': {
-                                                            color: '#392768',
-                                                        },
-                                                    }}
-                                                    onChange={() => handleTaskComplete(task?.id)}
-                                                    checked={weeklyCompletedTasks.includes(task?.id) || task?.status === 'completed'} // Check if the task ID is in completedTasks
-                                                />
-                                                <p className={`${weeklyCompletedTasks.includes(task?.id) || task?.status === 'completed' && 'line-through'} text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3`}>
-                                                    {task?.name}
-                                                </p>
-                                            </div>
-                                        ))}
+                                {weeklyTasks?.map((task, index) => (
+                                    <div key={index} className="flex items-center">
+                                        <Checkbox
+                                            size="small"
+                                            className="-translate-x-3"
+                                            sx={{
+                                                color: '#939393',
+                                                '&.Mui-checked': {
+                                                    color: '#392768',
+                                                },
+                                            }}
+                                            onChange={() => handleTaskComplete(task?.id)}
+                                            checked={weeklyCompletedTasks.includes(task?.id) || task?.status === 'completed'} // Check if the task ID is in completedTasks
+                                        />
+                                        <p className={`${weeklyCompletedTasks.includes(task?.id) || task?.status === 'completed' && 'line-through'} text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3`}>
+                                            {task?.name}
+                                        </p>
                                     </div>
+                                ))}
+                            </div>
                         </div>
                     )}
 
