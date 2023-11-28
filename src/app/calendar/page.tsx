@@ -10,6 +10,7 @@ import API from '@/constants/api.constant';
 import useRequest from '@/services/request.service';
 import useGlobalState from '@/hooks/globalstate.hook';
 import { Checkbox, IconButton } from '@mui/material';
+import toast from "react-hot-toast";
 
 const Calendar = () => {
     const { profile } = useGlobalState();
@@ -19,7 +20,10 @@ const Calendar = () => {
     const [selectRange, setSelectRange] = useState<any>(true);
     const [date, setDate] = useState(new Date());
     const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
+    const { makeRequest: makeTaskRequest, isLoading: isLoadingTask } = useRequest();
     const [allSymptoms, setAllSymptoms] = useState<any[]>([]);
+    const [weeklyTasks, setWeeklyTasks] = useState<any[]>([]);
+    const [weeklyCompletedTasks, setWeeklyCompletedTasks] = useState<any[]>([]);
 
 
     // Get Symptoms
@@ -105,6 +109,51 @@ const Calendar = () => {
     useEffect(() => {
         handleFetch();
     }, []);
+
+
+    // Complete a Task
+const handleTaskComplete = async (id: string) => {
+    try {
+      const res = await makeTaskRequest({
+        url: `${API.userTask}/${id}`,
+        method: 'PUT',
+      });
+      const { message, data } = res.data;
+  
+      toast.success(message);
+  
+      // Fetch updated task list after completion
+      fetchWeeklyTask(); // Call the function to fetch weekly tasks again
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  
+
+
+    // Get Weekly Tasks
+  const fetchWeeklyTask = async () => {
+    try {
+      const res = await makeTaskRequest({
+        url: API.userTask + '?filter=week',
+        method: 'GET',
+      });
+      const { status, data } = res.data;
+
+      const allTasks = data?.tasks || [];
+
+      // Filter pending tasks from allTasks
+    //   const newTasks = allTasks?.filter((task: { status: string }) => task?.status === 'pending');
+
+      setWeeklyTasks(allTasks);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeeklyTask();
+  }, []);
 
 
 
@@ -275,13 +324,7 @@ const Calendar = () => {
                 {/* Task for the day */}
                 <div className="mt-7 bg-[#F0EDF8] rounded-[16px] px-4 py-5 w-full h-auto" style={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
                     <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task for today</h1>
-
-                    <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
-                        <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
-                        <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
-                    </div>
-
-                    {/* {copingTips.length <= 0 ? (
+                    {weeklyTasks.length <= 0 ? (
                         <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
                             <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
                             <p className="font-[600] text-[2.5vw]">You’re yet to add your symptoms</p>
@@ -290,24 +333,28 @@ const Calendar = () => {
                         <div className="mt-5">
                             <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
                             <div className="w-full grid grid-cols-2 gap-x-10">
-                                {copingTips?.map((tip, index) => (
-                                    <div key={index} className="flex items-center">
-                                        <Checkbox
-                                            size="small"
-                                            className="-translate-x-3"
-                                            sx={{
-                                                color: '#939393',
-                                                '&.Mui-checked': {
-                                                    color: '#392768',
-                                                },
-                                            }}
-                                        />
-                                        <p className="text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3">{tip.title}</p>
+                                        {weeklyTasks?.map((task, index) => (
+                                            <div key={index} className="flex items-center">
+                                                <Checkbox
+                                                    size="small"
+                                                    className="-translate-x-3"
+                                                    sx={{
+                                                        color: '#939393',
+                                                        '&.Mui-checked': {
+                                                            color: '#392768',
+                                                        },
+                                                    }}
+                                                    onChange={() => handleTaskComplete(task?.id)}
+                                                    checked={weeklyCompletedTasks.includes(task?.id) || task?.status === 'completed'} // Check if the task ID is in completedTasks
+                                                />
+                                                <p className={`${weeklyCompletedTasks.includes(task?.id) || task?.status === 'completed' && 'line-through'} text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3`}>
+                                                    {task?.name}
+                                                </p>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
                         </div>
-                    )} */}
+                    )}
 
                 </div>
 
