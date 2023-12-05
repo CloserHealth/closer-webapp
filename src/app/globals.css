@@ -21,6 +21,16 @@
   font-family: 'Manrope', sans-serif;
 }
 
+.auth-bg {
+  background-image: url('https://res.cloudinary.com/dtuims4ku/image/upload/v1701815462/auth-banner-fotor-20231205233037_fhxmwr.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+}
+
 
 
 /* Calendar style */

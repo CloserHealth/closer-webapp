@@ -37,15 +37,16 @@ export default function Home() {
 
   return (
     <FadeIn>
-      <div className="px-5 pt-10 pb-20 min-h-[100vh] w-full bg-[#f9f9f9]">
-            <div className="w-full flex justify-center items-center mx-auto">
-                <Image src={Assets.closerLogo} alt="" width={130} height={100} />
+      <div className="px-5 pt-10 pb-20 min-h-[100vh] w-full bg-[#f9f9f9] auth-bg space-y-20 relative">
+            <div className="w-full flex justify-center items-center mx-auto mt-[7vw]">
+                <Image src={Assets.closerLogoWhite} alt="" width={130} height={100} />
             </div>
-            <h1 className="text-primaryColor font-[600] text-[5.5vw] mt-10 text-center px-7">Own Your Menstrual Cycle: Plan, Track, Thrive!</h1>
-            <div className="mt-10 w-full flex justify-center items-center mx-auto">
+           <div className="space-y-[15vw] absolute bottom-[25vw] right-5 left-5">
+           <h1 className="text-white font-[600] text-[5.5vw] text-center px-7">Own Your Menstrual Cycle: Plan, Track, Thrive!</h1>
+            {/* <div className="mt-10 w-full flex justify-center items-center mx-auto">
                 <Image src={Assets.landingImage} alt="" width={0} height={0} />
-            </div>
-            <div className="mt-7 space-y-5">
+            </div> */}
+            <div className="space-y-5">
                 <AppButton
                     content='Get Started'
                     onClickButton={goToSignup}
@@ -63,6 +64,7 @@ export default function Home() {
                     isDisabled={false}
                 />
             </div>
+           </div>
         </div>
       {/* <SplashScreen /> */}
     </FadeIn>
