@@ -115,7 +115,7 @@ const Calendar = () => {
     const fetchWeeklyTask = async () => {
         try {
             const res = await makeTaskRequest({
-                url: API.userTask + '?filter=month',
+                url: API.userTask + '?filter=day',
                 method: 'GET',
             });
             const { status, data } = res.data;
@@ -331,7 +331,7 @@ const Calendar = () => {
 
                 {/* Task for the day */}
                 <div className="mt-7 bg-[#F0EDF8] rounded-[16px] px-4 py-5 w-full h-auto" style={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
-                    <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task&apos;s for the month</h1>
+                    <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task for today</h1>
                     {weeklyTasks.length <= 0 ? (
                         <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
                             <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />
