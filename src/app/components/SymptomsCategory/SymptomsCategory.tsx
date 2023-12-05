@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Chip } from '@mui/material';
 
 export default function SymptomsCategory({ phase, experience, setSelectedChips, selectedChips, setSelectedPhase }: any) {
-    const handleChipClick = (id: string, category: string, phase: string) => {
+    const handleChipClick = (id: string, category: string, phase: string, name: string) => {
         const existingChip = selectedChips.find((chip: { id: string; phase: string; }) => chip.id === id && chip.phase === phase);
     
         if (existingChip) {
@@ -10,7 +10,7 @@ export default function SymptomsCategory({ phase, experience, setSelectedChips, 
                 prevSelected.filter((chip: { id: string; phase: string; }) => !(chip.id === id && chip.phase === phase))
             );
         } else {
-            setSelectedChips((prevSelected: any) => [...prevSelected, { id, category, phase }]);
+            setSelectedChips((prevSelected: any) => [...prevSelected, { id, category, phase, name }]);
             setSelectedPhase(phase);
         }
     };
@@ -24,11 +24,11 @@ export default function SymptomsCategory({ phase, experience, setSelectedChips, 
             </div>
             {/* chip */}
             <div className="w-full h-auto grid grid-cols-2 gap-x-7 gap-y-5 mt-5 px-7">
-                {experience?.map((item: { name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; id: string; }, index: React.Key | null | undefined) => (
+                {experience?.map((item: any, index: React.Key | null | undefined) => (
                     <Chip
                     key={index}
                     label={item?.name}
-                    onClick={() => handleChipClick(item?.id, phase, phase)}
+                    onClick={() => handleChipClick(item?.id, phase, phase, item?.name)}
                     sx={{
                         border: selectedChips.some((chip: { id: string; phase: any; }) => chip.id === item?.id && chip.phase === phase)
                             ? '2px solid #FF00FF'

@@ -148,8 +148,8 @@ export default function AddSymptom() {
 
             {openModal && (
                 <AppModal
-                    header="Symptom Added successful!"
-                    text="Your symptom has been added successfully."
+                    header="Symptom Updated successful!"
+                    text="Your symptom has been updated successfully."
                     buttonText="Continue"
                     onClick={() => router.push('/symptoms')}
                     onClose={() => {}}

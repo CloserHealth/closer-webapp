@@ -72,99 +72,132 @@ export default function Symptoms() {
 
 
     // Get Symptoms
-    useEffect(() => {
-        const fetchSymptoms = async () => {
-            try {
-                const res = await makeSymptomRequest({
-                    url: API.symptom + '?include=tips',
-                    method: 'GET',
-                });
-                const { status, data } = res.data;
-                setAllSymptoms(data?.symptoms);
-            } catch (e: any) {
-                console.log(e);
-            }
-        };
+ // Get Symptoms
+ useEffect(() => {
+    const fetchSymptoms = async () => {
+        try {
+            const res = await makeSymptomRequest({
+                url: API.userSymptom + '?include=symptoms,symptoms.tips',
+                method: 'GET',
+            });
+            const { data } = res.data;
 
-        fetchSymptoms();
-    }, []);
+            // Extract all 'symptoms' arrays from the response data
+            const allSymptomsArrays = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
+
+            // Merge the arrays and flatten them
+            const mergedSymptoms = [].concat(...allSymptomsArrays);
+
+            // Filter out duplicate symptoms based on 'name'
+            const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
+                const x = acc.find((item: any) => item?.name === current?.name);
+                if (!x) {
+                    return acc.concat([current]);
+                } else {
+                    return acc;
+                }
+            }, []);
+
+            // Set the updated 'symptoms' array to the state
+            setAllSymptoms(uniqueSymptoms);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    fetchSymptoms();
+}, []);
 
 
-
-
-
-
-// Create an object to store tips based on symptom names
-const [tipsBySymptom, setTipsBySymptom] = useState<{ [key: string]: any[] }>({});
-  const [checkedStates, setCheckedStates] = useState<{ [key: string]: boolean }>({});
-
-  useEffect(() => {
-    // Organize tips based on symptom names
-    const tips: { [key: string]: any[] } = {};
-    allSymptoms?.forEach((symptom: any) => {
-      if (symptom?.name && symptom?.tips) {
-        tips[symptom.name] = symptom?.tips;
-      }
-    });
-    setTipsBySymptom(tips);
-  }, [allSymptoms]);
-
-  useEffect(() => {
-    // Initialize checked states once tipsBySymptom is set
-    const initialCheckedStates: { [key: string]: boolean } = {};
-    Object.keys(tipsBySymptom).forEach((symptomName) => {
-      tipsBySymptom[symptomName].forEach((_, tipIndex) => {
-        initialCheckedStates[`${symptomName}-${tipIndex}`] = false;
-      });
-    });
-    setCheckedStates(initialCheckedStates);
-  }, [tipsBySymptom]);
-
-  const handleCheckboxChange = (symptomName: string, tipIndex: number) => {
-    setCheckedStates((prevCheckedStates) => ({
-      ...prevCheckedStates,
-      [`${symptomName}-${tipIndex}`]: !prevCheckedStates[`${symptomName}-${tipIndex}`],
-    }));
-  };
-  
-  
-// Render tips based on symptom names
-const TipsBySymptom = () => {
-  return (
-    <div>
-      {Object.keys(tipsBySymptom).map((symptomName, index) => (
-        <div key={index} className="mt-3">
-          <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptomName}</h3>
-          <div className="w-full grid grid-cols-2 gap-x-10">
-            {tipsBySymptom[symptomName].map((tip: any, tipIndex: number) => (
-              <div key={tipIndex} className="flex items-center">
-                <Checkbox
-                  size="small"
-                  className="-translate-x-3"
-                  checked={checkedStates[`${symptomName}-${tipIndex}`]}
-                  onChange={() => handleCheckboxChange(symptomName, tipIndex)}
-                  sx={{
-                    color: '#939393',
-                    '&.Mui-checked': {
-                      color: '#392768',
-                    },
-                  }}
-                />
-                <p
-                  className={`text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3 ${
-                    checkedStates[`${symptomName}-${tipIndex}`] ? 'line-through' : ''
-                  }`}
-                >
-                  {tip?.name}
-                </p>
-              </div>
-            ))}
-          </div>
+// Display the symptoms
+<div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
+    {Array.from(new Map(allSymptoms.map(item => [item['name'], item])).values()).map((symptom, index) => (
+        <div key={index} className="flex flex-col items-center space-y-2">
+            {/* Rendering code for symptoms */}
         </div>
-      ))}
-    </div>
-  );
-};
+    ))}
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    // Create an object to store tips based on symptom names
+    const [tipsBySymptom, setTipsBySymptom] = useState<{ [key: string]: any[] }>({});
+    const [checkedStates, setCheckedStates] = useState<{ [key: string]: boolean }>({});
+
+    useEffect(() => {
+        // Organize tips based on symptom names
+        const tips: { [key: string]: any[] } = {};
+        allSymptoms?.forEach((symptom: any) => {
+            if (symptom?.name && symptom?.tips) {
+                tips[symptom.name] = symptom?.tips;
+            }
+        });
+        setTipsBySymptom(tips);
+    }, [allSymptoms]);
+
+    useEffect(() => {
+        // Initialize checked states once tipsBySymptom is set
+        const initialCheckedStates: { [key: string]: boolean } = {};
+        Object.keys(tipsBySymptom).forEach((symptomName) => {
+            tipsBySymptom[symptomName].forEach((_, tipIndex) => {
+                initialCheckedStates[`${symptomName}-${tipIndex}`] = false;
+            });
+        });
+        setCheckedStates(initialCheckedStates);
+    }, [tipsBySymptom]);
+
+    const handleCheckboxChange = (symptomName: string, tipIndex: number) => {
+        setCheckedStates((prevCheckedStates) => ({
+            ...prevCheckedStates,
+            [`${symptomName}-${tipIndex}`]: !prevCheckedStates[`${symptomName}-${tipIndex}`],
+        }));
+    };
+
+
+    // Render tips based on symptom names
+    const TipsBySymptom = () => {
+        return (
+            <div>
+                {Object.keys(tipsBySymptom).map((symptomName, index) => (
+                    <div key={index} className="mt-3">
+                        <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptomName}</h3>
+                        <div className="w-full grid grid-cols-2 gap-x-10">
+                            {tipsBySymptom[symptomName].map((tip: any, tipIndex: number) => (
+                                <div key={tipIndex} className="flex items-center">
+                                    <Checkbox
+                                        size="small"
+                                        className="-translate-x-3"
+                                        checked={checkedStates[`${symptomName}-${tipIndex}`]}
+                                        onChange={() => handleCheckboxChange(symptomName, tipIndex)}
+                                        sx={{
+                                            color: '#939393',
+                                            '&.Mui-checked': {
+                                                color: '#392768',
+                                            },
+                                        }}
+                                    />
+                                    <p
+                                        className={`text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3 ${checkedStates[`${symptomName}-${tipIndex}`] ? 'line-through' : ''
+                                            }`}
+                                    >
+                                        {tip?.name}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
 
 
@@ -203,18 +236,38 @@ const TipsBySymptom = () => {
                     </div>
                 ) : (
                     <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
-                        {allSymptoms?.map((symptom, index) => (
+                        {Array.from(new Map(allSymptoms.map(item => [item['name'], item])).values()).map((symptom, index) => (
                             <div key={index} className="flex flex-col items-center space-y-2">
                                 <div
                                     className="flex justify-center items-center rounded-[12px] w-full h-[100px]"
                                     style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}
                                 >
-                                    <Image src={symptom?.image} alt={symptom?.name} width={50} height={50} />
+                                    <Image
+                                        src={
+                                            symptom?.name === 'Fever' ?
+                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/fever_high_temperature_icon_134900_1_wnvbkn.svg' :
+                                                symptom?.name === 'Fatigue' ? 
+                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/tiredness_tired_fatigue_icon_134898_1_1_ou4taq.svg' :
+                                                symptom?.name === 'Back Pain' ? 
+                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/pain_muscle_body_icon_134901_1_fqf166.svg' :
+                                                symptom?.name === 'Menstrual Cramps' ?
+                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/piercing_3467941_1_wcbshk.svg' :
+                                                symptom?.name === 'Bloating' ? 
+                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/stomach_204252_1_wul6rd.svg' :
+                                                symptom?.name === 'Headache' ? 
+                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/migraine_6836823_1_gkobqv.svg' :
+                                                ''}
+                                        alt={symptom?.name}
+                                        width={50}
+                                        height={50}
+                                    />
                                 </div>
-                                <p className="font-[800] text-[2.8vw] text-primaryColor">{symptom?.name}</p>
+                                <p className="font-[800] text-[2.8vw] text-primaryColor">{symptom?.name || '-----'}</p>
                             </div>
                         ))}
                     </div>
+
+
                 )}
 
 

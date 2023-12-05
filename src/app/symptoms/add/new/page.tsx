@@ -84,9 +84,6 @@ export default function NewSymptom() {
             localStorage.removeItem('afterPeriodSymptoms');
         } catch (e) {
             console.log(e);
-        } finally {
-            // Reset loading state after request completes
-            // setIsLoadingUserSymptom(false);
         }
     };
 
