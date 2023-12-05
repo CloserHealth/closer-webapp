@@ -19,7 +19,7 @@ const LandingPage = () => {
     }
 
     return (
-        <div className="px-5 pt-10 pb-20 min-h-[100vh] w-full bg-[#f9f9f9]">
+        <div className="px-5 pt-10 pb-20 bg-[#000] w-full auth-bg">
             <div className="w-full flex justify-center items-center mx-auto">
                 <Image src={Assets.closerLogo} alt="" width={130} height={100} />
             </div>

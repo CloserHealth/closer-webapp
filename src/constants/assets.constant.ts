@@ -1,4 +1,4 @@
-import closerLogo from '../app/assets/icons/closer-logo.svg'
+import closerLogo from '../app/assets/icons/closer-logo.svg';
 import closerLogoWhite from '../app/assets/icons/closer-logo-white.svg';
 import pattern from '../app/assets/icons/pattern.svg';
 import authImage from '../app/assets/images/auth-image.png';
