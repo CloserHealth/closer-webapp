@@ -249,3 +249,27 @@ export function SlideFadeUp({ children }: { children: React.ReactNode }) {
     </motion.div>
   );
 }
+
+
+export function ZoomIn({
+  children,
+  className,
+}: {
+  children?: ReactNode;
+  className?: string;
+  [key: string]: any;
+}) {
+  const variants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0 },
+  };
+
+  return (
+    <motion.div
+  animate={{ x: 100 }}
+  transition={{ ease: "easeOut", duration: 2 }}
+>
+{children}
+ </motion.div>
+  );
+}
