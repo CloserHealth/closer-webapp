@@ -11,6 +11,7 @@ import { AppModal } from '../components/Modals/Modals';
 import API from '@/constants/api.constant';
 import useRequest from '@/services/request.service';
 import toast from "react-hot-toast";
+import { InfinitySpin } from 'react-loader-spinner'
 
 export default function Task() {
     const router = useRouter();
@@ -54,7 +55,7 @@ const handleTaskComplete = async (id: string) => {
   const fetchWeeklyTask = async () => {
     try {
       const res = await makeTaskRequest({
-        url: API.userTask + '?filter=week',
+        url: API.userTask + '?filter=month',
         method: 'GET',
       });
       const { status, data } = res.data;
@@ -66,7 +67,7 @@ const handleTaskComplete = async (id: string) => {
   
       // Filter pending tasks from allTasks
       const newTasks = allTasks?.filter((task: { status: string }) => task?.status === 'pending');
-  
+      
       setWeeklyTasks(newTasks);
       setWeeklyCompletedTasks(completedTasks);
     } catch (e) {
@@ -96,9 +97,18 @@ const handleTaskComplete = async (id: string) => {
                     {/* <HeaderButton text="Set new task" onClickButton={handleOpenModal} /> */}
                 </div>
 
-                <div className="w-full h-auto rounded-[16px] mt-7 px-[20px] py-[28px]"
+                {isLoadingTask ? (
+                     <div className="w-full h-[158px] rounded-[16px] mt-7 flex justify-center items-center"
+                     style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
+                          <InfinitySpin
+                              width='200'
+                              color="#ffffff"
+                          />
+                      </div>
+                ) : (
+                    <div className="w-full h-auto rounded-[16px] mt-7 px-[20px] py-[28px]"
                     style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
-                    <h1 className="text-[5vw] font-[600] text-white">This Week’s Task</h1>
+                    <h1 className="text-[5vw] font-[600] text-white">This Month’s Task</h1>
                     <div className="mt-7 flex items-center justify-between">
                         {weeklyTasks?.length > 0 ? (
                             <p className="text-[3.5vw] font-[400] text-white">You have {weeklyTasks?.length} tasks on the queue. Ensure you complete them when due</p>
@@ -107,6 +117,7 @@ const handleTaskComplete = async (id: string) => {
                         )}
                     </div>
                 </div>
+                )}
 
 
                 {/* Tasks */}
@@ -146,8 +157,8 @@ const handleTaskComplete = async (id: string) => {
                             </div>
                         ) : (
                             <>
-                                <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task for the week</h1>
-                                <p className="text-[2.8vw] font-[400] text-[#1E1E1E] mt-1.5">Based on your phase, Closer suggests the following tasks to be done this week.</p>
+                                <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task for the month</h1>
+                                <p className="text-[2.8vw] font-[400] text-[#1E1E1E] mt-1.5">Based on your phase, Closer suggests the following tasks to be done this month.</p>
                                 <div className="mt-5">
                                     <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
                                     <div className="w-full grid grid-cols-2 gap-x-10">

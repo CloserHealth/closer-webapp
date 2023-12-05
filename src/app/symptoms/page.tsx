@@ -10,6 +10,7 @@ import { UserMenu } from '../components/Menu/Menu';
 import { useRouter } from 'next/navigation';
 import API from '@/constants/api.constant';
 import useRequest from '@/services/request.service';
+import { InfinitySpin } from 'react-loader-spinner'
 
 export default function Symptoms() {
     const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
@@ -72,56 +73,41 @@ export default function Symptoms() {
 
 
     // Get Symptoms
- // Get Symptoms
- useEffect(() => {
-    const fetchSymptoms = async () => {
-        try {
-            const res = await makeSymptomRequest({
-                url: API.userSymptom + '?include=symptoms,symptoms.tips',
-                method: 'GET',
-            });
-            const { data } = res.data;
+    // Get Symptoms
+    useEffect(() => {
+        const fetchSymptoms = async () => {
+            try {
+                const res = await makeSymptomRequest({
+                    url: API.userSymptom + '?include=symptoms,symptoms.tips',
+                    method: 'GET',
+                });
+                const { data } = res.data;
 
-            // Extract all 'symptoms' arrays from the response data
-            const allSymptomsArrays = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
+                // Extract all 'symptoms' arrays from the response data
+                const allSymptomsArrays = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
 
-            // Merge the arrays and flatten them
-            const mergedSymptoms = [].concat(...allSymptomsArrays);
+                // Merge the arrays and flatten them
+                const mergedSymptoms = [].concat(...allSymptomsArrays);
 
-            // Filter out duplicate symptoms based on 'name'
-            const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
-                const x = acc.find((item: any) => item?.name === current?.name);
-                if (!x) {
-                    return acc.concat([current]);
-                } else {
-                    return acc;
-                }
-            }, []);
+                // Filter out duplicate symptoms based on 'name'
+                const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
+                    const x = acc.find((item: any) => item?.name === current?.name);
+                    if (!x) {
+                        return acc.concat([current]);
+                    } else {
+                        return acc;
+                    }
+                }, []);
 
-            // Set the updated 'symptoms' array to the state
-            setAllSymptoms(uniqueSymptoms);
-        } catch (e) {
-            console.log(e);
-        }
-    };
+                // Set the updated 'symptoms' array to the state
+                setAllSymptoms(uniqueSymptoms);
+            } catch (e) {
+                console.log(e);
+            }
+        };
 
-    fetchSymptoms();
-}, []);
-
-
-// Display the symptoms
-<div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
-    {Array.from(new Map(allSymptoms.map(item => [item['name'], item])).values()).map((symptom, index) => (
-        <div key={index} className="flex flex-col items-center space-y-2">
-            {/* Rendering code for symptoms */}
-        </div>
-    ))}
-</div>
-
-
-
-
-
+        fetchSymptoms();
+    }, []);
 
 
 
@@ -225,49 +211,58 @@ export default function Symptoms() {
                     />
                 </>
 
-                {/* Symptoms */}
-                {allSymptoms?.length <= 0 ? (
-                    <div className="mt-7 w-full h-auto rounded-[16px] px-[20px] py-[28px]"
-                        style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
-                        <h1 className="text-[4.5vw] font-[600] text-white">Your Symptoms</h1>
-                        <div className="mt-5 flex items-center justify-between">
-                            <p className="text-[3vw] font-[400] text-white">Ooops! No symptoms found. Add your symptoms to get started.</p>
-                        </div>
+                {isLoadingSymptom ? (
+                    <div className="flex justify-center items-center rounded-[12px] w-full h-[150px] bg-[#FFD4ED]">
+                        <InfinitySpin
+                            width='200'
+                            color="#ffffff"
+                        />
                     </div>
                 ) : (
-                    <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
-                        {Array.from(new Map(allSymptoms.map(item => [item['name'], item])).values()).map((symptom, index) => (
-                            <div key={index} className="flex flex-col items-center space-y-2">
-                                <div
-                                    className="flex justify-center items-center rounded-[12px] w-full h-[100px]"
-                                    style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}
-                                >
-                                    <Image
-                                        src={
-                                            symptom?.name === 'Fever' ?
-                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/fever_high_temperature_icon_134900_1_wnvbkn.svg' :
-                                                symptom?.name === 'Fatigue' ? 
-                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/tiredness_tired_fatigue_icon_134898_1_1_ou4taq.svg' :
-                                                symptom?.name === 'Back Pain' ? 
-                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/pain_muscle_body_icon_134901_1_fqf166.svg' :
-                                                symptom?.name === 'Menstrual Cramps' ?
-                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/piercing_3467941_1_wcbshk.svg' :
-                                                symptom?.name === 'Bloating' ? 
-                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/stomach_204252_1_wul6rd.svg' :
-                                                symptom?.name === 'Headache' ? 
-                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/migraine_6836823_1_gkobqv.svg' :
-                                                ''}
-                                        alt={symptom?.name}
-                                        width={50}
-                                        height={50}
-                                    />
-                                </div>
-                                <p className="font-[800] text-[2.8vw] text-primaryColor">{symptom?.name || '-----'}</p>
+                    <>
+                        {/* Symptoms */}
+                        {allSymptoms?.length > 0 ? (
+                            <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
+                                {Array.from(new Map(allSymptoms.map(item => [item['name'], item])).values()).map((symptom, index) => (
+                                    <div key={index} className="flex flex-col items-center space-y-2">
+                                        <div
+                                            className="flex justify-center items-center rounded-[12px] w-full h-[100px]"
+                                            style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}
+                                        >
+                                            <Image
+                                                src={
+                                                    symptom?.name === 'Fever' ?
+                                                        'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/fever_high_temperature_icon_134900_1_wnvbkn.svg' :
+                                                        symptom?.name === 'Fatigue' ?
+                                                            'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/tiredness_tired_fatigue_icon_134898_1_1_ou4taq.svg' :
+                                                            symptom?.name === 'Back Pain' ?
+                                                                'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/pain_muscle_body_icon_134901_1_fqf166.svg' :
+                                                                symptom?.name === 'Menstrual Cramps' ?
+                                                                    'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/piercing_3467941_1_wcbshk.svg' :
+                                                                    symptom?.name === 'Bloating' ?
+                                                                        'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/stomach_204252_1_wul6rd.svg' :
+                                                                        symptom?.name === 'Headache' ?
+                                                                            'https://res.cloudinary.com/dtuims4ku/image/upload/v1701756356/migraine_6836823_1_gkobqv.svg' :
+                                                                            ''}
+                                                alt={symptom?.name}
+                                                width={50}
+                                                height={50}
+                                            />
+                                        </div>
+                                        <p className="font-[800] text-[2.8vw] text-primaryColor">{symptom?.name || '-----'}</p>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-
-
+                        ) : (
+                            <div className="mt-7 w-full h-auto rounded-[16px] px-[20px] py-[28px]"
+                                style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
+                                <h1 className="text-[4.5vw] font-[600] text-white">Your Symptoms</h1>
+                                <div className="mt-5 flex items-center justify-between">
+                                    <p className="text-[3vw] font-[400] text-white">Ooops! No symptoms found. Add your symptoms to get started.</p>
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
 
 

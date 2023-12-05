@@ -12,6 +12,7 @@ import { calculateDaysLeft } from '@/helpers';
 import Image from 'next/image';
 import Assets from '@/constants/assets.constant';
 import { useRouter } from 'next/navigation';
+import { InfinitySpin } from 'react-loader-spinner'
 
 const Dashboard = () => {
   const router = useRouter();
@@ -187,7 +188,7 @@ const Dashboard = () => {
   const fetchWeeklyTask = async () => {
     try {
       const res = await makeTaskRequest({
-        url: API.userTask + '?filter=week',
+        url: API.userTask + '?filter=month',
         method: 'GET',
       });
       const { status, data } = res.data;
@@ -227,25 +228,35 @@ const Dashboard = () => {
           </div>
           <div className='mt-28'>
             <p className="font-[700] text-[3.8vw] text-[#17181C]">Hello {profile?.data?.user?.firstname}, get closer to your best self!</p>
-            <div className="w-full h-auto rounded-[16px] mt-5 px-[20px] py-[28px] mb-7"
+            {isLoading ? (
+               <div className="w-full h-[150px] rounded-[16px] mt-5 flex justify-center items-center"
+               style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
+                    <InfinitySpin
+                        width='200'
+                        color="#ffffff"
+                    />
+                </div>
+            ) : (
+              <div className="w-full h-auto rounded-[16px] mt-5 px-[20px] py-[28px] mb-7"
               style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
               <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
               <div className="mt-7 flex items-center justify-between">
                 {phase?.name === undefined ? (
-                 <div className="space-y-2">
-                   <p className="text-[3.5vw] font-[400] text-white">{phase} 🩸</p>
-                  <button
-                  onClick={goToLogPeriod}
-                  className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
-                  Log Period
-                </button>
-                 </div>
+                  <div className="space-y-2">
+                    <p className="text-[3.5vw] font-[400] text-white">{phase} 🩸</p>
+                    <button
+                      onClick={goToLogPeriod}
+                      className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
+                      Log Period
+                    </button>
+                  </div>
                 ) : (
                   <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
                 )}
 
               </div>
             </div>
+            )}
 
             {/* Calendar */}
             <CustomCalendar
@@ -290,7 +301,7 @@ const Dashboard = () => {
                 boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)'
               }}>
               <div className="flex justify-between items-center">
-                <h1 className="text-[3.7vw] font-[600] text-white">This Week’s Tasks</h1>
+                <h1 className="text-[3.7vw] font-[600] text-white">This Month’s Tasks</h1>
                 <button
                   onClick={createTask}
                   className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
