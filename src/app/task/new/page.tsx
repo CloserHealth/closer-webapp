@@ -85,7 +85,7 @@ export default function NewTask() {
         const payload = {
             name,
             category: selectedCategories,
-            date: formattedDate
+            date: formattedDate + ' 23:59:00',
         };
 
         try {
