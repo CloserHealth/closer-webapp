@@ -46,28 +46,6 @@ const Calendar = () => {
         fetchSymptoms();
     }, []);
 
-    // Check box
-    const copingTips = [
-        {
-            title: 'Walk 1000 steps',
-        },
-        {
-            title: 'Sleep 8hours',
-        },
-        {
-            title: 'Drink 5litres of water',
-        },
-        {
-            title: 'Go to the gym',
-        },
-        {
-            title: 'Eat Protein',
-        },
-        {
-            title: 'Laugh a lot',
-        },
-    ];
-
     // phases
     const phases = [
         {
@@ -137,7 +115,7 @@ const Calendar = () => {
     const fetchWeeklyTask = async () => {
         try {
             const res = await makeTaskRequest({
-                url: API.userTask + '?filter=week',
+                url: API.userTask + '?filter=month',
                 method: 'GET',
             });
             const { status, data } = res.data;
@@ -158,8 +136,8 @@ const Calendar = () => {
     }, []);
 
     const goToLogPeriod = () => {
-    router.push('/period-log');
-  }
+        router.push('/period-log');
+    }
 
 
 
@@ -297,8 +275,20 @@ const Calendar = () => {
             </div>
             <div className='mt-28'>
                 <p className="font-[700] text-[3.8vw] text-[#17181C]">Calendar</p>
-                <div className="w-full h-auto rounded-[16px] mt-5 px-[20px] py-[28px] mb-7"
+                <div className="w-full h-auto rounded-[16px] mt-5 px-[20px] py-[28px] mb-7 relative"
                     style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
+                    <div className="absolute right-3 top-3">
+                        <Image src={
+                            phase?.name === 'Period' ?
+                                Assets.periodPhase :
+                                phase?.name === 'Ovulation' ?
+                                    Assets.ovulationPhase :
+                                    phase?.name === 'Follicular' ?
+                                        Assets.follicularPhase :
+                                        phase?.name === 'Luteal' ?
+                                            Assets.lutealPhase : ''
+                        } alt="" width={20} height={20} />
+                    </div>
                     <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
                     <div className="mt-7 flex items-center justify-between">
                         {phase?.name === undefined ? (
@@ -341,7 +331,7 @@ const Calendar = () => {
 
                 {/* Task for the day */}
                 <div className="mt-7 bg-[#F0EDF8] rounded-[16px] px-4 py-5 w-full h-auto" style={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}>
-                    <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task for today</h1>
+                    <h1 className="text-[#1E1E1E] text-[14px] font-[800]">Your Task&apos;s for the month</h1>
                     {weeklyTasks.length <= 0 ? (
                         <div className="w-full flex flex-col justify-center items-center space-y-2 mt-8 pb-7">
                             <Image src={Assets.cat} alt="No coping tips" width={120} height={120} />

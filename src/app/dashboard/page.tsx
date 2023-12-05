@@ -161,7 +161,7 @@ const Dashboard = () => {
         return (
           <div className="period-date-marker">
             <span className="period-date-text absolute">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="18" viewBox="0 0 8 12" fill="none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="15" viewBox="0 0 8 12" fill="none">
                 <path d="M6.9261 6.34468L3.61807 0.933594L0.552715 6.30769C-0.161063 7.44649 -0.223356 8.92726 0.526435 10.1537C1.59223 11.8969 3.88865 12.4566 5.65623 11.405C7.42315 10.3538 7.9919 8.08922 6.9261 6.34468Z" fill="#F3282B" />
               </svg>
             </span>
@@ -172,7 +172,7 @@ const Dashboard = () => {
         return (
           <div className="ovulation-date-marker">
             <span className="ovulation-date-text absolute">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="16" viewBox="0 0 7 8" fill="none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="14" viewBox="0 0 7 8" fill="none">
                 <path d="M3.86296 7.83105C3.05046 7.83105 2.36115 7.548 1.79504 6.98189C1.22893 6.41578 0.946011 5.72661 0.946289 4.91439C0.946289 4.37967 1.0349 3.84147 1.21212 3.2998C1.38934 2.75814 1.61851 2.26675 1.89962 1.82564C2.18073 1.3848 2.4949 1.0255 2.84212 0.747721C3.18934 0.469944 3.52962 0.331055 3.86296 0.331055C4.20323 0.331055 4.54532 0.469944 4.88921 0.747721C5.23309 1.0255 5.54559 1.38494 5.82671 1.82605C6.10782 2.26689 6.33698 2.75814 6.51421 3.2998C6.69143 3.84147 6.7799 4.37967 6.77962 4.91439C6.77962 5.72689 6.49657 6.41619 5.93046 6.9823C5.36434 7.54841 4.67518 7.83133 3.86296 7.83105ZM4.27962 6.58105C4.39768 6.58105 4.49671 6.54105 4.57671 6.46105C4.65671 6.38105 4.69657 6.28217 4.69629 6.16439C4.69629 6.04633 4.65629 5.9473 4.57629 5.8673C4.49629 5.7873 4.3974 5.74744 4.27962 5.74772C3.9324 5.74772 3.63726 5.62619 3.39421 5.38314C3.15115 5.14008 3.02962 4.84494 3.02962 4.49772C3.02962 4.37967 2.98962 4.28064 2.90962 4.20064C2.82962 4.12064 2.73073 4.08078 2.61296 4.08105C2.4949 4.08105 2.39587 4.12105 2.31587 4.20105C2.23587 4.28105 2.19601 4.37994 2.19629 4.49772C2.19629 5.07411 2.39948 5.5655 2.80587 5.97189C3.21226 6.37828 3.70351 6.58133 4.27962 6.58105Z" fill="#FFC700" />
               </svg>
             </span>
@@ -229,33 +229,45 @@ const Dashboard = () => {
           <div className='mt-28'>
             <p className="font-[700] text-[3.8vw] text-[#17181C]">Hello {profile?.data?.user?.firstname}, get closer to your best self!</p>
             {isLoading ? (
-               <div className="w-full h-[150px] rounded-[16px] mt-5 flex justify-center items-center"
-               style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
-                    <InfinitySpin
-                        width='200'
-                        color="#ffffff"
-                    />
-                </div>
-            ) : (
-              <div className="w-full h-auto rounded-[16px] mt-5 px-[20px] py-[28px] mb-7"
-              style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
-              <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
-              <div className="mt-7 flex items-center justify-between">
-                {phase?.name === undefined ? (
-                  <div className="space-y-2">
-                    <p className="text-[3.5vw] font-[400] text-white">{phase} 🩸</p>
-                    <button
-                      onClick={goToLogPeriod}
-                      className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
-                      Log Period
-                    </button>
-                  </div>
-                ) : (
-                  <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
-                )}
-
+              <div className="w-full h-[150px] rounded-[16px] mt-5 flex justify-center items-center"
+                style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
+                <InfinitySpin
+                  width='200'
+                  color="#ffffff"
+                />
               </div>
-            </div>
+            ) : (
+              <div className="w-full h-auto rounded-[16px] mt-5 px-[20px] py-[28px] mb-7 relative"
+                style={{ background: 'linear-gradient(90deg, #2B0A60 99.99%, #FFD4ED 100%)' }}>
+                <div className="absolute right-3 top-3">
+                  <Image src={
+                    phase?.name === 'Period' ?
+                      Assets.periodPhase :
+                      phase?.name === 'Ovulation' ?
+                        Assets.ovulationPhase :
+                        phase?.name === 'Follicular' ?
+                          Assets.follicularPhase :
+                          phase?.name === 'Luteal' ?
+                            Assets.lutealPhase : ''
+                  } alt="" width={20} height={20} />
+                </div>
+                <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
+                <div className="mt-7 flex items-center justify-between">
+                  {phase?.name === undefined ? (
+                    <div className="space-y-2">
+                      <p className="text-[3.5vw] font-[400] text-white">{phase} 🩸</p>
+                      <button
+                        onClick={goToLogPeriod}
+                        className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
+                        Log Period
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
+                  )}
+
+                </div>
+              </div>
             )}
 
             {/* Calendar */}
@@ -273,7 +285,7 @@ const Dashboard = () => {
               <div className="w-full h-auto px-[19px] py-[27px] bg-violet-100 rounded-2xl shadow border-t border-neutral-200 justify-center items-center inline-flex">
                 <div className="self-stretch flex-col justify-start items-center gap-[3px] inline-flex">
                   <div className="justify-start items-center inline-flex">
-                    <div className="text-stone-900 text-[3.5vw] font-semibold font-['Manrope'] leading-normal">Period</div>
+                    <div className="text-stone-900 text-[3.5vw] font-semibold font-['Manrope'] leading-normal flex items-center space-x-1.5 justify-center -mr-4"><span>Period</span> <Image src={Assets.periodPhase} alt="" width={15} height={15} /></div>
                     <div className="w-4 h-4 relative" />
                   </div>
                   <div className="text-stone-900 text-[3vw] font-normal font-['Montserrat'] leading-[18px] text-center">{periodLeftDays} days left: {formattedPeriodDate}</div>
@@ -283,7 +295,7 @@ const Dashboard = () => {
               <div className="w-full h-auto px-[19px] py-[27px] bg-violet-100 rounded-2xl shadow border-t border-neutral-200 justify-center items-center inline-flex">
                 <div className="self-stretch flex-col justify-start items-center gap-[3px] inline-flex">
                   <div className="justify-start items-center inline-flex">
-                    <div className="text-stone-900 text-[3.5vw] font-semibold font-['Manrope'] leading-normal">Ovulation</div>
+                    <div className="text-stone-900 text-[3.5vw] font-semibold font-['Manrope'] leading-normal flex items-center space-x-1.5 justify-center -mr-4"><span>Ovulation</span> <Image src={Assets.ovulationPhase} alt="" width={17} height={17} /></div>
                     <div className="w-4 h-4 relative" />
                   </div>
                   <div className="text-stone-900 text-[3vw] font-normal font-['Montserrat'] leading-[18px] text-center">{ovulationLeftDays} days left: {formattedOvulationDate}</div>
