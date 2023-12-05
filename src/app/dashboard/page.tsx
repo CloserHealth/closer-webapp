@@ -188,7 +188,7 @@ const Dashboard = () => {
   const fetchWeeklyTask = async () => {
     try {
       const res = await makeTaskRequest({
-        url: API.userTask + '?filter=month',
+        url: API.userTask + '?filter=week',
         method: 'GET',
       });
       const { status, data } = res.data;
@@ -313,7 +313,7 @@ const Dashboard = () => {
                 boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)'
               }}>
               <div className="flex justify-between items-center">
-                <h1 className="text-[3.7vw] font-[600] text-white">This Month’s Tasks</h1>
+                <h1 className="text-[3.7vw] font-[600] text-white">This Week’s Tasks</h1>
                 <button
                   onClick={createTask}
                   className="rounded-full px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
