@@ -11,7 +11,6 @@ import { AppButton, OutlinedAppButton } from './components/Buttons/Buttons';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 
-
 export default function Home() {
     // const navigate = useRouter();
     // const { isAuthenticated } = useGlobalState();
@@ -47,9 +46,10 @@ export default function Home() {
                 showThumbs={false}
                 showIndicators={false}
                 showStatus={false}
+                interval={7000}
             >
                 <FadeIn>
-                    <div className="px-5 pt-10 pb-20 min-h-[100vh] w-full bg-[#f9f9f9] auth-bg space-y-20 relative">
+                    <div className="px-5 pt-10 pb-20 min-h-[100vh] w-full bg-[#f9f9f9] auth-bg-2 space-y-20 relative">
                         <div className="flex justify-center items-center mx-auto mt-[7vw]">
                             <svg width="160" height="40" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g id="Group 1000003665">
@@ -114,7 +114,7 @@ export default function Home() {
 
                 {/* Slide 2 */}
                 <FadeIn>
-                    <div className="px-5 pt-10 pb-20 min-h-[100vh] w-full bg-[#f9f9f9] auth-bg-2 space-y-20 relative">
+                    <div className="px-5 pt-10 pb-20 min-h-[100vh] w-full bg-[#f9f9f9] auth-bg space-y-20 relative">
                         <div className="w-full flex justify-center items-center mx-auto mt-[7vw]">
                             {/* <Image src={Assets.closerLogoWhite} alt="" width={130} height={100} /> */}
                             <svg width="160" height="40" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -177,6 +177,8 @@ export default function Home() {
                         </div>
                     </div>
                 </FadeIn>
+
+                
 
             </Carousel>
 
