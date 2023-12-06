@@ -20,6 +20,7 @@
     "moment": "^2.29.4",
     "next": "13.5.4",
     "rc-banner-anim": "^2.4.5",
+    "rc-queue-anim": "^2.0.0",
     "react": "^18",
     "react-calendar": "^4.6.0",
     "react-chartjs-2": "^5.2.0",
