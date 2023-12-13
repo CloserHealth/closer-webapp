@@ -44,6 +44,8 @@ export const API = {
   userSymptom: '/user-symptoms',
   userTask: '/user-tasks',
   period: '/periods/log',
+
+  taskCategory: '/task-categories',
 };
 
 export default API;
