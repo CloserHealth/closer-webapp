@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
 import { Chip } from '@mui/material';
 
-export default function SymptomsCategory({ phase, experience, setSelectedChips, selectedChips, setSelectedPhase }: any) {
+export default function SymptomsCategory(
+    { 
+        phase, 
+        experience, 
+        setSelectedChips, 
+        selectedChips, 
+        setSelectedPhase ,
+        beforePeriodSymptoms,
+        duringPeriodSymptoms,
+        afterPeriodSymptoms,
+        allPhase,
+    }: any) {
     const handleChipClick = (id: string, category: string, phase: string, name: string) => {
         const existingChip = selectedChips.find((chip: { id: string; phase: string; }) => chip.id === id && chip.phase === phase);
     

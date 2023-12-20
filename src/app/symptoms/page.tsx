@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import API from '@/constants/api.constant';
 import useRequest from '@/services/request.service';
 import { InfinitySpin } from 'react-loader-spinner'
+import Loader from '../components/Loader/Loader';
 
 export default function Symptoms() {
     const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
@@ -188,7 +189,11 @@ export default function Symptoms() {
 
 
     return (
-        <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full bg-white'>
+        <>
+        {isLoadingSymptom ? (
+            <Loader />
+        ) : (
+            <div className='px-5 pb-20 relative h-[100vh] overflow-y-auto w-full bg-white'>
             <div className="fixed top-0 right-0 left-0 z-50">
                 <MobileNavbar />
             </div>
@@ -211,15 +216,7 @@ export default function Symptoms() {
                     />
                 </>
 
-                {isLoadingSymptom ? (
-                    <div className="flex justify-center items-center rounded-[12px] w-full h-[150px] bg-[#FFD4ED]">
-                        <InfinitySpin
-                            width='200'
-                            color="#ffffff"
-                        />
-                    </div>
-                ) : (
-                    <>
+                <>
                         {/* Symptoms */}
                         {allSymptoms?.length > 0 ? (
                             <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
@@ -263,7 +260,6 @@ export default function Symptoms() {
                             </div>
                         )}
                     </>
-                )}
 
 
                 {/* <div className="mt-10">
@@ -335,5 +331,8 @@ export default function Symptoms() {
 
             </div>
         </div>
+        )}
+        </>
+       
     )
 }
