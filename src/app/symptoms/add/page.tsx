@@ -10,6 +10,24 @@ import useRequest from '@/services/request.service';
 import SymptomsCategory from '@/app/components/SymptomsCategory/SymptomsCategory';
 import API from '@/constants/api.constant';
 
+interface Chip {
+    id: string;
+    category: string;
+    phase: string;
+    name: string;
+}
+
+interface CategorizedSymptoms {
+    [key: string]: {
+        [key: string]: { id: string; name: string }[];
+    };
+}
+
+type SelectedChip = {
+    id: string;
+    phase: string;
+    name: string;
+};
 
 export default function AddSymptom() {
     const router = useRouter();
@@ -18,11 +36,15 @@ export default function AddSymptom() {
     const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
     const { makeRequest: makeUserSymptomRequest, isLoading: isLoadingUserSymptom } = useRequest();
     const [allSymptoms, setAllSymptoms] = useState<any[]>([]);
-    const [selectedChips, setSelectedChips] = useState<{ id: string; name: string; category: string; phase: string }[]>([]);
-    const [selectedPhase, setSelectedPhase] = useState<string>('');
+    const [periodPhase, setPeriodPhase] = useState<any>();
+    const [selectedChips, setSelectedChips] = useState<SelectedChip[]>([]);
+    const [selectedPhase, setSelectedPhase] = useState('');
     const [beforePeriodSymptoms, setBeforePeriodSymptoms] = useState<any>([]);
     const [duringPeriodSymptoms, setDuringPeriodSymptoms] = useState<any>([]);
     const [afterPeriodSymptoms, setAfterPeriodSymptoms] = useState<any>([]);
+    const [beforePeriodId, setBeforePeriodId] = useState<string>('');
+    const [duringPeriodId, setDuringPeriodId] = useState<string>('');
+    const [afterPeriodId, setAfterPeriodId] = useState<string>('');
 
     const handleOpenModal = () => {
         setOpenModal(true);
@@ -41,11 +63,30 @@ export default function AddSymptom() {
         const fetchSymptoms = async () => {
             try {
                 const res = await makeSymptomRequest({
-                    url: API.symptom + '?include=tips',
+                    url: API.symptomConfig + '?include=symptoms',
                     method: 'GET',
                 });
                 const { status, data } = res.data;
-                setAllSymptoms(data?.symptoms);
+                setPeriodPhase(data?.configs);
+
+                // Filter symptoms for each phase
+                const beforePeriod = data.configs.find((phase: { slug: string; }) => phase.slug === 'before-period');
+                const duringPeriod = data.configs.find((phase: { slug: string; }) => phase.slug === 'during-period');
+                const afterPeriod = data.configs.find((phase: { slug: string; }) => phase.slug === 'after-period');
+
+                // Set symptoms for each phase in the state variables
+                if (beforePeriod) {
+                    setBeforePeriodSymptoms(beforePeriod?.symptoms);
+                    setBeforePeriodId(beforePeriod?.id);
+                }
+                if (duringPeriod) {
+                    setDuringPeriodSymptoms(duringPeriod?.symptoms);
+                    setDuringPeriodId(duringPeriod?.id);
+                }
+                if (afterPeriod) {
+                    setAfterPeriodSymptoms(afterPeriod?.symptoms);
+                    setAfterPeriodId(afterPeriod?.id);
+                }
             } catch (e: any) {
                 console.log(e);
             }
@@ -55,39 +96,56 @@ export default function AddSymptom() {
     }, []);
 
 
+
+
     useEffect(() => {
-        const beforePeriodSymptoms = selectedChips
-          .filter((chip) => chip.category === 'Before Period')
+        const beforePeriodSymptom = selectedChips
+          .filter((chip) => chip.phase === 'before-period')
           .map((chip) => ({ id: chip.id}));
       
-        const duringPeriodSymptoms = selectedChips
-          .filter((chip) => chip.category === 'During Period')
+        const duringPeriodSymptom = selectedChips
+          .filter((chip) => chip.phase === 'during-period')
           .map((chip) => ({ id: chip.id}));
       
-        const afterPeriodSymptoms = selectedChips
-          .filter((chip) => chip.category === 'After Period')
+        const afterPeriodSymptom = selectedChips
+          .filter((chip) => chip.phase === 'after-period')
           .map((chip) => ({ id: chip.id}));
       
         // Update state variables
-        setBeforePeriodSymptoms(beforePeriodSymptoms);
-        setDuringPeriodSymptoms(duringPeriodSymptoms);
-        setAfterPeriodSymptoms(afterPeriodSymptoms);
+        setBeforePeriodSymptoms(beforePeriodSymptom);
+        setDuringPeriodSymptoms(duringPeriodSymptom);
+        setAfterPeriodSymptoms(afterPeriodSymptom);
     
       }, [selectedChips]);
-      
-      
-      
 
+
+
+    // Function to handle chip selection
+    const handleChipClick = (id: string, phase: string, name: string) => {
+        const existingChip = selectedChips.find((chip) => chip.id === id && chip.phase === phase);
+
+        if (existingChip) {
+            setSelectedChips((prevSelected) =>
+                prevSelected.filter((chip) => !(chip.id === id && chip.phase === phase))
+            );
+        } else {
+            // Use the spread operator to create a new array with the updated chip
+            setSelectedChips((prevSelected) => [
+                ...prevSelected,
+                { id, phase, name },
+            ]);
+        }
+    };
 
     const handleSave = async () => {
-        // Prepare the POST request payload using the state variables
+
         const payload = {
             name: 'Symptoms',
             image: '',
             symptoms: {
-                before_period: beforePeriodSymptoms,
-                during_period: duringPeriodSymptoms,
-                after_period: afterPeriodSymptoms,
+                [beforePeriodId]: beforePeriodSymptoms,
+                [duringPeriodId]: duringPeriodSymptoms,
+                [afterPeriodId]: afterPeriodSymptoms,
             },
         };
 
@@ -100,15 +158,13 @@ export default function AddSymptom() {
 
             const { status, data }: any = res.data;
             handleOpenModal();
-            // goToSymptoms();
         } catch (e) {
             console.log(e);
         }
     };
 
-    const goToSymptoms = () => {
-        router.push('/symptoms');
-    };
+
+
 
 
 
@@ -127,9 +183,35 @@ export default function AddSymptom() {
                     <p className="text-[#17181C] text-[4vw] font-[400]">What symptoms do you experience during the following phases?</p>
 
                     <div className="mt-5 space-y-10">
-                        <SymptomsCategory phase="Before Period" experience={allSymptoms} setSelectedChips={setSelectedChips} selectedChips={selectedChips} setSelectedPhase={setSelectedPhase} />
-                        <SymptomsCategory phase="During Period" experience={allSymptoms} setSelectedChips={setSelectedChips} selectedChips={selectedChips} setSelectedPhase={setSelectedPhase} />
-                        <SymptomsCategory phase="After Period" experience={allSymptoms} setSelectedChips={setSelectedChips} selectedChips={selectedChips} setSelectedPhase={setSelectedPhase} />
+                        {periodPhase?.map((phase: any, i: any) => (
+                            <div key={i}>
+                                <div className="bg-[#F5F5F5] rounded-[5px] w-full flex justify-between items-center py-[7px] px-[10px]">
+                                    <p className="text-[#1E1E1E] font-[700] text-[3vw]">{phase?.name}</p>
+                                    <p className="text-primaryColor font-[500] text-[3vw]">Select 1 or more</p>
+                                </div>
+                                {/* chip */}
+                                <div className="w-full h-auto grid grid-cols-2 gap-x-7 gap-y-5 mt-5 px-7">
+                                    {phase?.symptoms?.map((item: any, index: React.Key | null | undefined) => (
+                                        <Chip
+                                            key={index}
+                                            label={item?.name}
+                                            onClick={() => handleChipClick(item?.id, phase?.slug, item?.name)}
+                                            sx={{
+                                                border: selectedChips.some(
+                                                    (chip) => chip.id === item?.id && chip.phase === phase?.slug
+                                                )
+                                                    ? '2px solid #FF00FF'
+                                                    : '2px solid transparent',
+                                            }}
+                                        />
+
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* <SymptomsCategory phase="During Period" experience={allSymptoms} setSelectedChips={setSelectedChips} selectedChips={selectedChips} setSelectedPhase={setSelectedPhase} />
+                        <SymptomsCategory phase="After Period" experience={allSymptoms} setSelectedChips={setSelectedChips} selectedChips={selectedChips} setSelectedPhase={setSelectedPhase} /> */}
                     </div>
 
                     <div>
@@ -152,7 +234,7 @@ export default function AddSymptom() {
                     text="Your symptom has been added successfully."
                     buttonText="Continue"
                     onClick={() => router.push('/symptoms')}
-                    onClose={() => {}}
+                    onClose={() => { }}
                 />
             )}
         </>

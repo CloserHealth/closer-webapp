@@ -41,6 +41,7 @@ export const API = {
   getProjects: '/admin/projects',
 
   symptom: '/symptoms',
+  symptomConfig: '/symptom-config',
   userSymptom: '/user-symptoms',
   userTask: '/user-tasks',
   period: '/periods/log',
