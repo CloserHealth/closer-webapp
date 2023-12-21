@@ -452,7 +452,7 @@ const Calendar = () => {
                         <div className="mt-5">
                             <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
                             <div className="w-full mt-5">
-                                <TipsBySymptom handleComplete={handleSymptomComplete} />
+                                <TipsBySymptom />
                             </div>
                         </div>
                     )}
