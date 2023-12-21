@@ -154,14 +154,21 @@ export default function Symptoms() {
         return (
             <div>
                 {Object.keys(tipsBySymptom).map((symptomName, index) => (
-                    <div key={index} className="mt-3">
+                    <div key={index} className="mt-5">
                         <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptomName}</h3>
-                        <div className="w-full grid grid-cols-2 gap-x-10">
+                        <div className="w-full grid grid-cols-1 gap-y-2 mt-3">
                             {tipsBySymptom[symptomName].map((tip: any, tipIndex: number) => (
-                                <div key={tipIndex} className="flex items-center">
-                                    <Checkbox
+                                <div key={tipIndex} className="flex items-center justify-between bg-white p-3 space-x-1 rounded-[8px] relative">
+                                    <p
+                                        className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${checkedStates[`${symptomName}-${tipIndex}`] ? 'line-through' : ''
+                                            }`}
+                                    >
+                                        {tip?.name}
+                                    </p>
+                                      <div className="">
+                                   <Checkbox
                                         size="small"
-                                        className="-translate-x-3"
+                                        className="translate-x-3"
                                         checked={checkedStates[`${symptomName}-${tipIndex}`]}
                                         onChange={() => handleCheckboxChange(symptomName, tipIndex)}
                                         sx={{
@@ -171,12 +178,7 @@ export default function Symptoms() {
                                             },
                                         }}
                                     />
-                                    <p
-                                        className={`text-[2.5vw] font-[500] text-[#1E1E1E] -translate-x-3 ${checkedStates[`${symptomName}-${tipIndex}`] ? 'line-through' : ''
-                                            }`}
-                                    >
-                                        {tip?.name}
-                                    </p>
+                                   </div>
                                 </div>
                             ))}
                         </div>
