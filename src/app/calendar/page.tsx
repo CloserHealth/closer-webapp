@@ -23,26 +23,37 @@ const Calendar = () => {
     const [date, setDate] = useState(new Date());
     const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
     const { makeRequest: makeTaskRequest, isLoading: isLoadingTask } = useRequest();
+    const { makeRequest: makeTipRequest, isLoading: isLoadingTip } = useRequest();
     const [allSymptoms, setAllSymptoms] = useState<any[]>([]);
     const [weeklyTasks, setWeeklyTasks] = useState<any[]>([]);
     const [weeklyCompletedTasks, setWeeklyCompletedTasks] = useState<any[]>([]);
 
 
     // Get Symptoms
-    useEffect(() => {
-        const fetchSymptoms = async () => {
-            try {
-                const res = await makeSymptomRequest({
-                    url: API.symptom + '?include=tips',
-                    method: 'GET',
-                });
-                const { status, data } = res.data;
-                setAllSymptoms(data?.symptoms);
-            } catch (e: any) {
-                console.log(e);
-            }
-        };
+    const fetchSymptoms = async () => {
+        try {
+            const res = await makeSymptomRequest({
+                url: API.userSymptom + '?include=symptoms,symptoms.tips',
+                method: 'GET',
+            });
+            const { status, data } = res.data;
+            const symptoms = data?.symptoms;
 
+
+            // Calculate symptomsArray and combinedSymptoms after setting allSymptoms
+            const symptomsArray = symptoms.map((symptomSet: { symptoms: any; }) => symptomSet.symptoms);
+            const combinedSymptoms = symptomsArray.flat();
+
+            console.log(combinedSymptoms);
+            // Set allSymptoms state with the fetched data
+            setAllSymptoms(combinedSymptoms);
+        } catch (e: any) {
+            console.log(e);
+        }
+    };
+
+
+    useEffect(() => {
         fetchSymptoms();
     }, []);
 
@@ -75,7 +86,6 @@ const Calendar = () => {
             });
 
             const { message, data } = res.data;
-            console.log(data)
 
             if (message === "Data fetched successfully!") {
                 setPeriodLog(data?.period_log);
@@ -139,6 +149,26 @@ const Calendar = () => {
         router.push('/period-log');
     }
 
+
+
+    // Complete a symptom
+    const handleSymptomComplete = async (id: string, configId: string, tipId: string) => {
+        try {
+            const res = await makeTipRequest({
+                url: `${API.userSymptom}/${id}/${configId}/${tipId}`,
+                method: 'PUT',
+            });
+            const { message, data } = res.data;
+
+            toast.success(message);
+            fetchSymptoms();
+
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    console.log(allSymptoms)
 
 
 
@@ -422,7 +452,7 @@ const Calendar = () => {
                         <div className="mt-5">
                             <p className="text-[2.8vw] font-[600] text-[#1E1E1E] mt-1.5">Select Checkbox once an activity is completed</p>
                             <div className="w-full mt-5">
-                                <TipsBySymptom />
+                                <TipsBySymptom handleComplete={handleSymptomComplete} />
                             </div>
                         </div>
                     )}
