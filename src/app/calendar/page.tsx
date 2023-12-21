@@ -307,7 +307,7 @@ const Calendar = () => {
                 {Object.keys(tipsBySymptom).map((symptomName, index) => (
                     <div key={index} className="mt-3">
                         <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptomName}</h3>
-                        <div className="w-full grid grid-cols-2 gap-x-10">
+                        <div className="w-full grid grid-cols-1 gap-y-5">
                             {tipsBySymptom[symptomName].map((tip: any, tipIndex: number) => (
                                 <div key={tipIndex} className="flex items-center">
                                     <Checkbox
