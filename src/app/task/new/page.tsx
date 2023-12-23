@@ -22,11 +22,13 @@ export default function NewTask() {
     const { isLoading, makeRequest } = useRequest();
     const [selectRange, setSelectRange] = useState<any>(false);
     const [datePicker, setDatePicker] = useState<boolean>(false);
+    const [datePickerEnd, setDatePickerEnd] = useState<boolean>(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const { makeRequest: makeTaskRequest, isLoading: isLoadingTask } = useRequest();
     const { makeRequest: makeTaskCategoryRequest, isLoading: isLoadingTaskCategory } = useRequest();
     const [name, setName] = useState<string>("");
-    const [date, setDate] = useState<any>(new Date());
+    const [startDate, setStartDate] = useState<any>(new Date());
+    const [endDate, setEndDate] = useState<any>(new Date());
     const [selectedCategories, setSelectedCategories] = useState<any>([]);
     const [category, setCategory] = useState<any[]>([]);
 
@@ -72,10 +74,15 @@ export default function NewTask() {
 
 
     // Format date
-    const formattedDate = date.toLocaleDateString('en-GB')
+    const formattedStartDate = startDate.toLocaleDateString('en-GB')
         .split('/')
         .reverse()
         .join('-'); // Format as "YYYY-MM-DD"
+
+    const formattedEndDate = endDate.toLocaleDateString('en-GB')
+        .split('/')
+        .reverse()
+        .join('-');
 
 
     const handleOpenModal = () => {
@@ -101,7 +108,8 @@ export default function NewTask() {
         const payload = {
             name,
             category: selectedCategories,
-            date: formattedDate + ' 23:59:00',
+            start_date: formattedStartDate + ' 23:59:00',
+            end_date: formattedEndDate + ' 23:59:00',
         };
 
         try {
@@ -114,7 +122,8 @@ export default function NewTask() {
             const { status, data }: any = res.data;
             handleOpenModal();
             setName("");
-            setDate(new Date());
+            setStartDate(new Date());
+            setEndDate(new Date());
             setSelectedCategories([]);
         } catch (e) {
             console.log(e);
@@ -176,18 +185,46 @@ export default function NewTask() {
                             </div>
 
                             <div className="w-full">
-                                <label htmlFor='lastPeriod' className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">Date</label>
+                                <label htmlFor='lastPeriod' className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">Start Date</label>
                                 <div className="relative">
                                     <input
                                         type='text'
                                         id='date'
-                                        value={formattedDate}
+                                        value={formattedStartDate}
                                         onChange={() => { }}
                                         className={`border border-[#E3E4E8] text-gray-900 text-[4vw] rounded-[8px] outline-none w-full px-4 py-3`}
                                         placeholder='Select date to be achieved'
                                     />
 
-                                    <div className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer' onClick={() => setDatePicker(!datePicker)}>
+                                    <div className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'
+                                        onClick={() => {
+                                            setDatePicker(!datePicker);
+                                            setDatePickerEnd(false);
+                                        }}>
+                                        <IconButton>
+                                            <Image src={Assets.calendar} alt="" width={20} height={20} />
+                                        </IconButton>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="w-full">
+                                <label htmlFor='lastPeriod' className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">End Date</label>
+                                <div className="relative">
+                                    <input
+                                        type='text'
+                                        id='date'
+                                        value={formattedEndDate}
+                                        onChange={() => { }}
+                                        className={`border border-[#E3E4E8] text-gray-900 text-[4vw] rounded-[8px] outline-none w-full px-4 py-3`}
+                                        placeholder='Select date to be achieved'
+                                    />
+
+                                    <div className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'
+                                        onClick={() => {
+                                            setDatePickerEnd(!datePickerEnd);
+                                            setDatePicker(false);
+                                        }}>
                                         <IconButton>
                                             <Image src={Assets.calendar} alt="" width={20} height={20} />
                                         </IconButton>
@@ -197,8 +234,20 @@ export default function NewTask() {
                             {/* Calendar */}
                             {datePicker && (
                                 <CustomCalendar
-                                    date={date}
-                                    setDate={setDate}
+                                    date={startDate}
+                                    setDate={setStartDate}
+                                    selectRange={selectRange}
+                                    setSelectRange={setSelectRange}
+                                    periodStartDate={undefined}
+                                    periodEndDate={undefined}
+                                    tileContent={undefined}
+                                />
+                            )}
+
+                            {datePickerEnd && (
+                                <CustomCalendar
+                                    date={endDate}
+                                    setDate={setEndDate}
                                     selectRange={selectRange}
                                     setSelectRange={setSelectRange}
                                     periodStartDate={undefined}

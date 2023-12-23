@@ -12,10 +12,15 @@ import API from '@/constants/api.constant';
 import useRequest from '@/services/request.service';
 import { InfinitySpin } from 'react-loader-spinner'
 import Loader from '../components/Loader/Loader';
+import toast from 'react-hot-toast';
 
 export default function Symptoms() {
     const { makeRequest: makeSymptomRequest, isLoading: isLoadingSymptom } = useRequest();
-    const [allSymptoms, setAllSymptoms] = useState<any[]>([]);
+    const { makeRequest: makeTipRequest, isLoading: isLoadingTip } = useRequest();
+    const [allSymptoms, setAllSymptoms] = useState<any>([]);
+    const [allSymptomsCard, setAllSymptomsCard] = useState<any>([]);
+    const [completedTipsData, setCompletedTipsData] = useState<any>([]);
+
 
 
     const router = useRouter();
@@ -85,10 +90,12 @@ export default function Symptoms() {
                 const { data } = res.data;
 
                 // Extract all 'symptoms' arrays from the response data
-                const allSymptomsArrays = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
+                const allSymptomsArrays = data?.symptoms;
+                const allSymptomsArraysNew = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
+                const c = data?.symptoms.map((item: any) => item?.completed_tips) || [];
+                setCompletedTipsData(c[0])
 
-                // Merge the arrays and flatten them
-                const mergedSymptoms = [].concat(...allSymptomsArrays);
+                const mergedSymptoms = [].concat(...allSymptomsArraysNew);
 
                 // Filter out duplicate symptoms based on 'name'
                 const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
@@ -101,7 +108,8 @@ export default function Symptoms() {
                 }, []);
 
                 // Set the updated 'symptoms' array to the state
-                setAllSymptoms(uniqueSymptoms);
+                setAllSymptoms(allSymptomsArrays);
+                setAllSymptomsCard(uniqueSymptoms)
             } catch (e) {
                 console.log(e);
             }
@@ -116,73 +124,83 @@ export default function Symptoms() {
 
 
     // Create an object to store tips based on symptom names
-    const [tipsBySymptom, setTipsBySymptom] = useState<{ [key: string]: any[] }>({});
     const [checkedStates, setCheckedStates] = useState<{ [key: string]: boolean }>({});
 
-    useEffect(() => {
-        // Organize tips based on symptom names
-        const tips: { [key: string]: any[] } = {};
-        allSymptoms?.forEach((symptom: any) => {
-            if (symptom?.name && symptom?.tips) {
-                tips[symptom.name] = symptom?.tips;
-            }
-        });
-        setTipsBySymptom(tips);
-    }, [allSymptoms]);
 
-    useEffect(() => {
-        // Initialize checked states once tipsBySymptom is set
-        const initialCheckedStates: { [key: string]: boolean } = {};
-        Object.keys(tipsBySymptom).forEach((symptomName) => {
-            tipsBySymptom[symptomName].forEach((_, tipIndex) => {
-                initialCheckedStates[`${symptomName}-${tipIndex}`] = false;
-            });
-        });
-        setCheckedStates(initialCheckedStates);
-    }, [tipsBySymptom]);
-
-    const handleCheckboxChange = (symptomName: string, tipIndex: number) => {
-        setCheckedStates((prevCheckedStates) => ({
-            ...prevCheckedStates,
-            [`${symptomName}-${tipIndex}`]: !prevCheckedStates[`${symptomName}-${tipIndex}`],
+    const handleSymptomCheckbox = (symptomId: string, tipId: string) => {
+        const key = `${symptomId}-${tipId}`;
+        setCheckedStates(prevStates => ({
+            ...prevStates,
+            [key]: !prevStates[key] // Toggle the checked state
         }));
     };
 
+
+
+
+    const handleSymptomComplete = async (id: string, tipId: string) => {
+        try {
+            const res = await makeTipRequest({
+                url: `${API.userSymptom}/${id}/complete-tip/${tipId}`,
+                method: 'PUT',
+            });
+            const { message, data } = res.data;
+            setCompletedTipsData(data?.task?.completed_tips)
+
+            toast.success('Tip completed successfully!');
+
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const completedTips = completedTipsData || [];
 
     // Render tips based on symptom names
     const TipsBySymptom = () => {
         return (
             <div>
-                {Object.keys(tipsBySymptom).map((symptomName, index) => (
-                    <div key={index} className="mt-5">
-                        <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptomName}</h3>
-                        <div className="w-full grid grid-cols-1 gap-y-2 mt-3">
-                            {tipsBySymptom[symptomName].map((tip: any, tipIndex: number) => (
-                                <div key={tipIndex} className="flex items-center justify-between bg-white p-3 space-x-1 rounded-[8px] relative">
-                                    <p
-                                        className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${checkedStates[`${symptomName}-${tipIndex}`] ? 'line-through' : ''
-                                            }`}
-                                    >
-                                        {tip?.name}
-                                    </p>
-                                      <div className="">
-                                   <Checkbox
-                                        size="small"
-                                        className="translate-x-3"
-                                        checked={checkedStates[`${symptomName}-${tipIndex}`]}
-                                        onChange={() => handleCheckboxChange(symptomName, tipIndex)}
-                                        sx={{
-                                            color: '#939393',
-                                            '&.Mui-checked': {
-                                                color: '#392768',
-                                            },
-                                        }}
-                                    />
-                                   </div>
+                {allSymptoms.map((symptomCategoryKey: { symptoms: any[]; id: string; }, index: React.Key | null | undefined) => (
+                    <React.Fragment key={index}>
+                        {symptomCategoryKey?.symptoms?.map((symptom: any, i: React.Key | null | undefined) => (
+                            <div key={i} className="mt-5">
+                                <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptom?.name}</h3>
+                                <div className="w-full grid grid-cols-1 gap-y-2 mt-3">
+                                    {symptom?.tips?.map((tip: any, tipIndex: number) => {
+                                        const isChecked = completedTips.includes(tip?.name);
+                                        const isChecked2 = completedTipsData.includes(tip?.name);
+
+                                        return (
+                                            <div key={tipIndex} className="flex items-center justify-between bg-white p-3 space-x-1 rounded-[8px] relative">
+                                                <p
+                                                    className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${checkedStates[`${symptomCategoryKey?.id}-${tip?.id}`] || isChecked || isChecked2 ? 'line-through' : ''
+                                                        }`}
+                                                >
+                                                    {tip?.name}
+                                                </p>
+                                                <div className="">
+                                                    <Checkbox
+                                                        size="small"
+                                                        className="translate-x-3"
+                                                        checked={checkedStates[`${symptomCategoryKey?.id}-${tip?.id}`] || isChecked || isChecked2}
+                                                        onChange={() => handleSymptomCheckbox(symptomCategoryKey?.id, tip?.id)}
+                                                        onClick={() => handleSymptomComplete(symptomCategoryKey?.id, tip?.id)}
+                                                        sx={{
+                                                            color: '#939393',
+                                                            '&.Mui-checked': {
+                                                                color: '#392768',
+                                                            },
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )
+
+                                    })}
                                 </div>
-                            ))}
-                        </div>
-                    </div>
+                            </div>
+                        ))}
+                    </React.Fragment>
                 ))}
             </div>
         );
@@ -218,11 +236,12 @@ export default function Symptoms() {
                             />
                         </>
 
+
                         <>
                             {/* Symptoms */}
-                            {allSymptoms?.length > 0 ? (
+                            {allSymptomsCard?.length > 0 ? (
                                 <div className="mt-7 grid grid-cols-3 gap-x-3 gap-y-5">
-                                    {Array.from(new Map(allSymptoms.map(item => [item['name'], item])).values()).map((symptom, index) => (
+                                    {Array.from(new Map(allSymptomsCard?.map((item: any) => [item['name'], item])).values()).map((symptom: any, index) => (
                                         <div key={index} className="flex flex-col items-center space-y-2">
                                             <div
                                                 className="flex justify-center items-center rounded-[12px] w-full h-[100px]"
@@ -283,6 +302,7 @@ export default function Symptoms() {
                                     </div>
                                 </div>
                             )}
+
                         </>
 
 
@@ -313,7 +333,7 @@ export default function Symptoms() {
                         </div>
 
                         {/* Health Watch */}
-                        {healthWatch.length > 0 && symptoms.length > 0 && (
+                        {/* {healthWatch.length > 0 && symptoms.length > 0 && (
                             <div className="mt-7">
                                 <div className="flex items-center justify-between">
                                     <h1 className="text-[#17181C] font-[700] text-[4vw]">Health Watch</h1>
@@ -350,7 +370,7 @@ export default function Symptoms() {
                                     ))}
                                 </div>
                             </div>
-                        )}
+                        )} */}
 
 
                     </div>

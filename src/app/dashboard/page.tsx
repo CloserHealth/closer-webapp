@@ -307,12 +307,12 @@ const Dashboard = () => {
                   <Image src={
                     phase?.name === 'Period' ?
                       Assets.periodPhase :
-                      phase?.name === 'Ovulation' ?
+                      phase?.name === 'Ovulatory' ?
                         Assets.ovulationPhase :
                         phase?.name === 'Follicular' ?
                           Assets.follicularPhase :
                           phase?.name === 'Luteal' ?
-                            Assets.lutealPhase : ''
+                            Assets.lutealPhase : Assets.periodPhase
                   } alt="" width={20} height={20} />
                 </div>
                 <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
@@ -331,6 +331,11 @@ const Dashboard = () => {
                   )}
 
                 </div>
+                <button
+                  onClick={goToLogPeriod}
+                  className="rounded-full absolute right-2 bottom-2 px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
+                  Log Period
+                </button>
               </div>
             )}
 
@@ -359,7 +364,7 @@ const Dashboard = () => {
               <div className="w-full h-auto px-[19px] py-[27px] bg-violet-100 rounded-2xl shadow border-t border-neutral-200 justify-center items-center inline-flex">
                 <div className="self-stretch flex-col justify-start items-center gap-[3px] inline-flex">
                   <div className="justify-start items-center inline-flex">
-                    <div className="text-stone-900 text-[3.5vw] font-semibold font-['Manrope'] leading-normal flex items-center space-x-1.5 justify-center -mr-4"><span>Ovulation</span> <Image src={Assets.ovulationPhase} alt="" width={17} height={17} /></div>
+                    <div className="text-stone-900 text-[3.5vw] font-semibold font-['Manrope'] leading-normal flex items-center space-x-1.5 justify-center -mr-4"><span>Ovulatory</span> <Image src={Assets.ovulationPhase} alt="" width={17} height={17} /></div>
                     <div className="w-4 h-4 relative" />
                   </div>
                   <div className="text-stone-900 text-[3vw] font-normal font-['Montserrat'] leading-[18px] text-center">{ovulationLeftDays} days left: {formattedOvulationDate}</div>
