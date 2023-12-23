@@ -47,6 +47,7 @@ export const API = {
   period: '/periods/log',
 
   taskCategory: '/task-categories',
+  checkTaskPhase: '/user-tasks/check-phase',
 };
 
 export default API;

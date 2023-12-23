@@ -140,19 +140,26 @@ export default function Symptoms() {
 
     const handleSymptomComplete = async (id: string, tipId: string) => {
         try {
-            const res = await makeTipRequest({
-                url: `${API.userSymptom}/${id}/complete-tip/${tipId}`,
-                method: 'PUT',
-            });
-            const { message, data } = res.data;
-            setCompletedTipsData(data?.task?.completed_tips)
-
-            toast.success('Tip completed successfully!');
-
-        } catch (e) {
-            console.log(e);
+          const res = await makeTipRequest({
+            url: `${API.userSymptom}/${id}/complete-tip/${tipId}`,
+            method: 'PUT',
+          });
+      
+          const { message, data } = res.data;
+          setCompletedTipsData(data?.task?.completed_tips);
+      
+          toast.success('Tip completed successfully!');
+        } catch (error: any) {
+          if (error.response && error.response.data && error.response.data.error) {
+            const errorMessage = error.response.data.error;
+            toast.error(errorMessage); // Show the error message using toast.error
+          } else {
+            console.error('An error occurred:', error);
+            // If the error doesn't contain a specific message, you can show a generic error message
+            toast.error('An error occurred while completing the tip.');
+          }
         }
-    };
+      };
 
     const completedTips = completedTipsData || [];
 
