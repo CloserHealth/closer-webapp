@@ -246,7 +246,7 @@ export default function NewTask() {
                             </div>
 
                             <div className="w-full">
-                                <label htmlFor='lastPeriod' className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">Category</label>
+                                <label htmlFor='lastPeriod' className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">Select a Category</label>
                                 <Select
                                     labelId="demo-select-small-label"
                                     id="category"
