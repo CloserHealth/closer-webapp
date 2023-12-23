@@ -8,7 +8,7 @@ import { AppButton } from '@/app/components/Buttons/Buttons';
 import CustomCalendar from '@/app/components/Calendar/Calendar';
 import { formattedDate } from '@/helpers/date.helper';
 import { date } from 'yup';
-import { AppModal } from '@/app/components/Modals/Modals';
+import { AppModal, TaskNoticeModal } from '@/app/components/Modals/Modals';
 import useRequest from '@/services/request.service';
 import TextField from '@/app/components/Fields/TextField';
 import API from '@/constants/api.constant';
@@ -24,13 +24,30 @@ export default function NewTask() {
     const [datePicker, setDatePicker] = useState<boolean>(false);
     const [datePickerEnd, setDatePickerEnd] = useState<boolean>(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
+    const [openTaskNoticeModal, setOpenTaskNoticeModal] = useState<boolean>(false);
     const { makeRequest: makeTaskRequest, isLoading: isLoadingTask } = useRequest();
+    const { makeRequest: makeTaskPhaseCheckRequest, isLoading: isLoadingTaskPhaseCheck } = useRequest();
     const { makeRequest: makeTaskCategoryRequest, isLoading: isLoadingTaskCategory } = useRequest();
     const [name, setName] = useState<string>("");
     const [startDate, setStartDate] = useState<any>(new Date());
     const [endDate, setEndDate] = useState<any>(new Date());
     const [selectedCategories, setSelectedCategories] = useState<any>([]);
     const [category, setCategory] = useState<any[]>([]);
+    const [taskPhaseMessage, setTaskPhaseMessage] = useState('');
+    const [startDatePhase, setStartDatePhase] = useState(new Date());
+    const [endDatePhase, setEndDatePhase] = useState(new Date());
+    const [dateSaved, setDateSaved] = useState(false)
+
+    useEffect(() => {
+        // Retrieve saved dates from localStorage if available
+        const savedDates = localStorage.getItem('savedDates');
+        if (savedDates) {
+            setDateSaved(true)
+            const { start, end } = JSON.parse(savedDates);
+            setStartDatePhase(new Date(start));
+            setEndDatePhase(new Date(end));
+        }
+    }, []);
 
 
     // Get task categories
@@ -84,12 +101,28 @@ export default function NewTask() {
         .reverse()
         .join('-');
 
+    const formattedStartDatePhase = startDatePhase.toLocaleDateString('en-GB')
+        .split('/')
+        .reverse()
+        .join('-'); // Format as "YYYY-MM-DD"
+
+    const formattedEndDatePhase = endDatePhase.toLocaleDateString('en-GB')
+        .split('/')
+        .reverse()
+        .join('-');
 
     const handleOpenModal = () => {
         setOpenModal(true);
     }
     const handleCloseModal = () => {
         setOpenModal(false);
+    }
+
+    const handleOpenTaskNoticeModal = () => {
+        setOpenTaskNoticeModal(true);
+    }
+    const handleCloseTaskNoticeModal = () => {
+        setOpenTaskNoticeModal(false);
     }
 
     const goBack = () => {
@@ -101,15 +134,52 @@ export default function NewTask() {
     };
 
 
-    const handleCreate = async (e: any) => {
+    const handleCheckTaskPhase = async (e: any) => {
         e.preventDefault();
 
         // Prepare the POST request payload using the state variables
         const payload = {
             name,
             category: selectedCategories,
-            start_date: formattedStartDate + ' 23:59:00',
-            end_date: formattedEndDate + ' 23:59:00',
+            start_date: dateSaved ? formattedStartDatePhase + ' 23:59:00' : formattedStartDate + ' 23:59:00',
+            end_date: dateSaved ? formattedEndDatePhase + '23:59:00' : formattedEndDate + ' 23:59:00',
+        };
+
+        try {
+            const res = await makeTaskPhaseCheckRequest({
+                url: API.checkTaskPhase,
+                method: 'POST',
+                data: payload,
+            });
+
+            const { status, data, meta, message }: any = res.data;
+
+            if (meta?.saved === false) {
+                const { start, end } = data?.dates;
+                setTaskPhaseMessage(message);
+                handleOpenTaskNoticeModal();
+                localStorage.setItem('savedNewTaskDates', JSON.stringify({ start, end }));
+            } else {
+                handleOpenModal();
+                setName("");
+                setStartDate(new Date());
+                setEndDate(new Date());
+                setSelectedCategories([]);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+
+    const handleCreate = async () => {
+
+        // Prepare the POST request payload using the state variables
+        const payload = {
+            name,
+            category: selectedCategories,
+            start_date: dateSaved ? formattedStartDatePhase + ' 23:59:00' : formattedStartDate + ' 23:59:00',
+            end_date: dateSaved ? formattedEndDatePhase + '23:59:00' : formattedEndDate + ' 23:59:00',
         };
 
         try {
@@ -120,16 +190,25 @@ export default function NewTask() {
             });
 
             const { status, data }: any = res.data;
+            handleCloseTaskNoticeModal();
             handleOpenModal();
             setName("");
             setStartDate(new Date());
             setEndDate(new Date());
             setSelectedCategories([]);
+
         } catch (e) {
             console.log(e);
         }
     };
 
+
+    const onCloseTaskPhaseModal = () => {
+        handleCreate();
+        handleCloseTaskNoticeModal();
+        localStorage.removeItem('savedNewTaskDates'); // Remove stored dates from localStorage after task creation
+        setDateSaved(false); // Reset dateSaved state variable
+    }
 
 
 
@@ -149,7 +228,7 @@ export default function NewTask() {
                         </div>
                         <p className="text-[#17181C] font-[600] text-[4.5vw]">Set new Task</p>
                     </div>
-                    <form className="mt-12 w-full h-auto space-y-14" onSubmit={handleCreate}>
+                    <form className="mt-12 w-full h-auto space-y-14" onSubmit={handleCheckTaskPhase}>
 
                         <div className="space-y-5">
                             <div className="w-full">
@@ -262,7 +341,7 @@ export default function NewTask() {
                                 type="submit"
                                 content="Next"
                                 isDisabled={false}
-                                isLoading={isLoadingTask}
+                                isLoading={isLoadingTask || isLoadingTaskPhaseCheck}
                                 onClickButton={() => { }}
                                 isRounded={true}
                             />
@@ -279,6 +358,15 @@ export default function NewTask() {
                     buttonText="Continue"
                     onClick={goToTask}
                     onClose={handleCloseModal}
+                />
+            )}
+
+            {openTaskNoticeModal && (
+                <TaskNoticeModal
+                    header="Optimal Timing for Task Execution"
+                    text={taskPhaseMessage}
+                    onClick={handleCreate}
+                    onClose={onCloseTaskPhaseModal}
                 />
             )}
         </>
