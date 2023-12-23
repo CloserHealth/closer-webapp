@@ -27,33 +27,44 @@ const Calendar = () => {
     const [allSymptoms, setAllSymptoms] = useState<any[]>([]);
     const [weeklyTasks, setWeeklyTasks] = useState<any[]>([]);
     const [weeklyCompletedTasks, setWeeklyCompletedTasks] = useState<any[]>([]);
+    const [completedTipsData, setCompletedTipsData] = useState<any>([]);
 
 
     // Get Symptoms
-    const fetchSymptoms = async () => {
-        try {
-            const res = await makeSymptomRequest({
-                url: API.userSymptom + '?include=symptoms,symptoms.tips',
-                method: 'GET',
-            });
-            const { status, data } = res.data;
-            const symptoms = data?.symptoms;
-
-
-            // Calculate symptomsArray and combinedSymptoms after setting allSymptoms
-            const symptomsArray = symptoms.map((symptomSet: { symptoms: any; }) => symptomSet.symptoms);
-            const combinedSymptoms = symptomsArray.flat();
-
-            console.log(combinedSymptoms);
-            // Set allSymptoms state with the fetched data
-            setAllSymptoms(combinedSymptoms);
-        } catch (e: any) {
-            console.log(e);
-        }
-    };
-
-
     useEffect(() => {
+        const fetchSymptoms = async () => {
+            try {
+                const res = await makeSymptomRequest({
+                    url: API.userSymptom + '?include=symptoms,symptoms.tips',
+                    method: 'GET',
+                });
+                const { data } = res.data;
+
+                // Extract all 'symptoms' arrays from the response data
+                const allSymptomsArrays = data?.symptoms;
+                const allSymptomsArraysNew = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
+                const c = data?.symptoms.map((item: any) => item?.completed_tips) || [];
+                setCompletedTipsData(c[0])
+
+                const mergedSymptoms = [].concat(...allSymptomsArraysNew);
+
+                // Filter out duplicate symptoms based on 'name'
+                const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
+                    const x = acc.find((item: any) => item?.name === current?.name);
+                    if (!x) {
+                        return acc.concat([current]);
+                    } else {
+                        return acc;
+                    }
+                }, []);
+
+                // Set the updated 'symptoms' array to the state
+                setAllSymptoms(allSymptomsArrays);
+            } catch (e) {
+                console.log(e);
+            }
+        };
+
         fetchSymptoms();
     }, []);
 
@@ -149,26 +160,6 @@ const Calendar = () => {
         router.push('/period-log');
     }
 
-
-
-    // Complete a symptom
-    const handleSymptomComplete = async (id: string, configId: string, tipId: string) => {
-        try {
-            const res = await makeTipRequest({
-                url: `${API.userSymptom}/${id}/${configId}/${tipId}`,
-                method: 'PUT',
-            });
-            const { message, data } = res.data;
-
-            toast.success(message);
-            fetchSymptoms();
-
-        } catch (e) {
-            console.log(e);
-        }
-    };
-
-    console.log(allSymptoms)
 
 
 
@@ -267,75 +258,84 @@ const Calendar = () => {
 
 
     // Create an object to store tips based on symptom names
-    const [tipsBySymptom, setTipsBySymptom] = useState<{ [key: string]: any[] }>({});
     const [checkedStates, setCheckedStates] = useState<{ [key: string]: boolean }>({});
 
-    useEffect(() => {
-        // Organize tips based on symptom names
-        const tips: { [key: string]: any[] } = {};
-        allSymptoms?.forEach((symptom: any) => {
-            if (symptom?.name && symptom?.tips) {
-                tips[symptom.name] = symptom?.tips;
-            }
-        });
-        setTipsBySymptom(tips);
-    }, [allSymptoms]);
 
-    useEffect(() => {
-        // Initialize checked states once tipsBySymptom is set
-        const initialCheckedStates: { [key: string]: boolean } = {};
-        Object.keys(tipsBySymptom).forEach((symptomName) => {
-            tipsBySymptom[symptomName].forEach((_, tipIndex) => {
-                initialCheckedStates[`${symptomName}-${tipIndex}`] = false;
-            });
-        });
-        setCheckedStates(initialCheckedStates);
-    }, [tipsBySymptom]);
-
-    const handleCheckboxChange = (symptomName: string, tipIndex: number) => {
-        setCheckedStates((prevCheckedStates) => ({
-            ...prevCheckedStates,
-            [`${symptomName}-${tipIndex}`]: !prevCheckedStates[`${symptomName}-${tipIndex}`],
+    const handleSymptomCheckbox = (symptomId: string, tipId: string) => {
+        const key = `${symptomId}-${tipId}`;
+        setCheckedStates(prevStates => ({
+            ...prevStates,
+            [key]: !prevStates[key] // Toggle the checked state
         }));
     };
 
+
+  
+    const handleSymptomComplete = async (id: string, tipId: string) => {
+        try {
+            const res = await makeTipRequest({
+                url: `${API.userSymptom}/${id}/complete-tip/${tipId}`,
+                method: 'PUT',
+            });
+            const { message, data } = res.data;
+            setCompletedTipsData(data?.task?.completed_tips)
+
+            toast.success('Tip completed successfully!');
+
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const completedTips = completedTipsData || [];
 
     // Render tips based on symptom names
     const TipsBySymptom = () => {
         return (
             <div>
-                {Object.keys(tipsBySymptom).map((symptomName, index) => (
-                    <div key={index} className="mt-5">
-                        <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptomName}</h3>
-                        <div className="w-full grid grid-cols-1 gap-y-2 mt-3">
-                            {tipsBySymptom[symptomName].map((tip: any, tipIndex: number) => (
-                                <div key={tipIndex} className="flex items-center justify-between bg-white p-3 space-x-1 rounded-[8px] relative">
-                                    <p
-                                        className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${checkedStates[`${symptomName}-${tipIndex}`] ? 'line-through' : ''
-                                            }`}
-                                    >
-                                        {tip?.name}
-                                    </p>
-                                      <div className="">
-                                   <Checkbox
-                                        size="small"
-                                        className="translate-x-3"
-                                        checked={checkedStates[`${symptomName}-${tipIndex}`]}
-                                        onChange={() => handleCheckboxChange(symptomName, tipIndex)}
-                                        sx={{
-                                            color: '#939393',
-                                            '&.Mui-checked': {
-                                                color: '#392768',
-                                            },
-                                        }}
-                                    />
-                                   </div>
-                                </div>
-                            ))}
+            {allSymptoms.map((symptomCategoryKey: { symptoms: any[]; id: string; }, index: React.Key | null | undefined) => (
+                <React.Fragment key={index}>
+                    {symptomCategoryKey?.symptoms?.map((symptom: any, i: React.Key | null | undefined) => (
+                        <div key={i} className="mt-5">
+                            <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptom?.name}</h3>
+                            <div className="w-full grid grid-cols-1 gap-y-2 mt-3">
+                                {symptom?.tips?.map((tip: any, tipIndex: number) => {
+                                    const isChecked = completedTips.includes(tip?.name);
+                                    const isChecked2 = completedTipsData.includes(tip?.name);
+
+                                    return (
+                                        <div key={tipIndex} className="flex items-center justify-between bg-white p-3 space-x-1 rounded-[8px] relative">
+                                            <p
+                                                className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${checkedStates[`${symptomCategoryKey?.id}-${tip?.id}`] || isChecked || isChecked2 ? 'line-through' : ''
+                                                    }`}
+                                            >
+                                                {tip?.name}
+                                            </p>
+                                            <div className="">
+                                                <Checkbox
+                                                    size="small"
+                                                    className="translate-x-3"
+                                                    checked={checkedStates[`${symptomCategoryKey?.id}-${tip?.id}`] || isChecked || isChecked2}
+                                                    onChange={() => handleSymptomCheckbox(symptomCategoryKey?.id, tip?.id)}
+                                                    onClick={() => handleSymptomComplete(symptomCategoryKey?.id, tip?.id)}
+                                                    sx={{
+                                                        color: '#939393',
+                                                        '&.Mui-checked': {
+                                                            color: '#392768',
+                                                        },
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+
+                                })}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </React.Fragment>
+            ))}
+        </div>
         );
     };
 
@@ -353,12 +353,12 @@ const Calendar = () => {
                         <Image src={
                             phase?.name === 'Period' ?
                                 Assets.periodPhase :
-                                phase?.name === 'Ovulation' ?
+                                phase?.name === 'Ovulatory' ?
                                     Assets.ovulationPhase :
                                     phase?.name === 'Follicular' ?
                                         Assets.follicularPhase :
                                         phase?.name === 'Luteal' ?
-                                            Assets.lutealPhase : ''
+                                            Assets.lutealPhase : Assets.periodPhase
                         } alt="" width={20} height={20} />
                     </div>
                     <h1 className="text-[5vw] font-[600] text-white">Your Cycle Phase</h1>
@@ -373,9 +373,16 @@ const Calendar = () => {
                                 </button>
                             </div>
                         ) : (
-                            <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
+                            <div>
+                                <p className="text-[3.5vw] font-[400] text-white">You’re currently in your <span className="font-[800]">{phase?.name || '-----'} Phase</span>... <br /> <span>Learn More</span></p>
+                            </div>
                         )}
                     </div>
+                    <button
+                        onClick={goToLogPeriod}
+                        className="rounded-full absolute right-2 bottom-2 px-5 py-[6px] bg-primaryColor border-[0.75px] border-[#E3E4E8] text-[2.5vw] text-white">
+                        Log Period
+                    </button>
                 </div>
 
                 {/* Calendar */}
