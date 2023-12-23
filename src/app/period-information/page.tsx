@@ -106,7 +106,7 @@ export default function PeriodInformation() {
                             <TextField
                                 id="periodLength"
                                 type="number"
-                                label="Period Length"
+                                label="Period Length (e.g 4days)"
                                 placeholder="Enter period length (Days)"
                                 value={periodLength}
                                 onInputChange={handlePeriodLengthChange}
