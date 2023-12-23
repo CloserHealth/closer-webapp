@@ -363,7 +363,7 @@ export default function NewTask() {
 
             {openTaskNoticeModal && (
                 <TaskNoticeModal
-                    header="Notice"
+                    header="Optimal Timing for Task Execution"
                     text={taskPhaseMessage}
                     onClick={handleCreate}
                     onClose={onCloseTaskPhaseModal}

@@ -45,7 +45,7 @@ export function TaskNoticeModal({ text, header, icon, onClose, onClick }: any) {
                 <div className="flex justify-between border-b border-gray-100 px-5 py-4">
                     <div>
                         <i className="fa fa-exclamation-triangle text-orange-500"></i>
-                        <span className="font-bold text-gray-700 text-lg">{header}</span>
+                        <span className="font-bold text-gray-700 text-[4vw]">{header}</span>
                     </div>
                 </div>
 
@@ -54,7 +54,7 @@ export function TaskNoticeModal({ text, header, icon, onClose, onClick }: any) {
                         {text}
                     </p>
                     <p className="px-16 text-gray-600 text-[4vw]">
-                        Will you like to Proceed with the new Timeframe?
+                    Would you like to embrace this revised timeframe?
                     </p>
                 </div>
 
