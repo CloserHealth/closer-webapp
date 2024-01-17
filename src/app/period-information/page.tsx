@@ -6,7 +6,7 @@ import { AppModal } from '../components/Modals/Modals';
 import { useRouter } from 'next/navigation';
 import Assets from '@/constants/assets.constant';
 import TextField from '../components/Fields/TextField';
-import { IconButton } from '@mui/material';
+import { ClickAwayListener, IconButton, Tooltip } from '@mui/material';
 import API from '@/constants/api.constant';
 import { catchAsync } from '@/helpers/api.helper';
 import useRequest from '@/services/request.service';
@@ -15,6 +15,8 @@ import CustomCalendar from '../components/Calendar/Calendar';
 import useGlobalState from '@/hooks/globalstate.hook';
 import { profileUpdateAction } from '@/store/profile.slice';
 import { useDispatch } from 'react-redux';
+import { GrCircleInformation } from "react-icons/gr";
+
 
 
 export default function PeriodInformation() {
@@ -89,6 +91,17 @@ export default function PeriodInformation() {
     };
 
 
+    const [openTip, setOpenTip] = React.useState(false);
+
+    const handleTooltipClose = () => {
+        setOpenTip(false);
+    };
+
+    const handleTooltipOpen = () => {
+        setOpenTip(!openTip);
+    };
+
+
     return (
         <>
             <div className='w-full min-h-[100vh] px-5 pt-7 pb-20 relative bg-white'>
@@ -117,7 +130,29 @@ export default function PeriodInformation() {
                             />
 
                             <div className="w-full">
-                                <label htmlFor='lastPeriod' className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">Last Period</label>
+                                <div className="flex items-center space-x-3 mb-2">
+                                    <label htmlFor='lastPeriod' className="block text-[4vw] font-medium text-gray-900">Previous Period (Start date)</label>
+                                    <ClickAwayListener onClickAway={handleTooltipClose}>
+                                        <div>
+                                            <Tooltip
+                                                PopperProps={{
+                                                    disablePortal: true,
+                                                }}
+                                                // onClose={handleTooltipClose}
+                                                open={openTip}
+                                                disableFocusListener
+                                                disableHoverListener
+                                                title="Enter the date your last menstrual period started. This helps track your menstrual cycle more effectively."
+                                                placement="top"
+                                                arrow
+                                            >
+                                                <div onClick={handleTooltipOpen}>
+                                                    <GrCircleInformation style={{ color: "#000", fontSize: '20px' }} />
+                                                </div>
+                                            </Tooltip>
+                                        </div>
+                                    </ClickAwayListener>
+                                </div>
                                 <div className="relative">
                                     <input
                                         type='text'

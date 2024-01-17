@@ -79,42 +79,41 @@ export default function Symptoms() {
 
 
     // Get Symptoms
-    // Get Symptoms
+    const fetchSymptoms = async () => {
+        try {
+            const res = await makeSymptomRequest({
+                url: API.userSymptom + '?include=symptoms,symptoms.tips',
+                method: 'GET',
+            });
+            const { data } = res.data;
+
+            // Extract all 'symptoms' arrays from the response data
+            const allSymptomsArrays = data?.symptoms;
+            const allSymptomsArraysNew = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
+            const c = data?.symptoms.map((item: any) => item?.completed_tips) || [];
+            setCompletedTipsData(c[0])
+
+            const mergedSymptoms = [].concat(...allSymptomsArraysNew);
+
+            // Filter out duplicate symptoms based on 'name'
+            const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
+                const x = acc.find((item: any) => item?.name === current?.name);
+                if (!x) {
+                    return acc.concat([current]);
+                } else {
+                    return acc;
+                }
+            }, []);
+
+            // Set the updated 'symptoms' array to the state
+            setAllSymptoms(allSymptomsArrays);
+            setAllSymptomsCard(uniqueSymptoms)
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     useEffect(() => {
-        const fetchSymptoms = async () => {
-            try {
-                const res = await makeSymptomRequest({
-                    url: API.userSymptom + '?include=symptoms,symptoms.tips',
-                    method: 'GET',
-                });
-                const { data } = res.data;
-
-                // Extract all 'symptoms' arrays from the response data
-                const allSymptomsArrays = data?.symptoms;
-                const allSymptomsArraysNew = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
-                const c = data?.symptoms.map((item: any) => item?.completed_tips) || [];
-                setCompletedTipsData(c[0])
-
-                const mergedSymptoms = [].concat(...allSymptomsArraysNew);
-
-                // Filter out duplicate symptoms based on 'name'
-                const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
-                    const x = acc.find((item: any) => item?.name === current?.name);
-                    if (!x) {
-                        return acc.concat([current]);
-                    } else {
-                        return acc;
-                    }
-                }, []);
-
-                // Set the updated 'symptoms' array to the state
-                setAllSymptoms(allSymptomsArrays);
-                setAllSymptomsCard(uniqueSymptoms)
-            } catch (e) {
-                console.log(e);
-            }
-        };
-
         fetchSymptoms();
     }, []);
 
@@ -140,26 +139,26 @@ export default function Symptoms() {
 
     const handleSymptomComplete = async (id: string, tipId: string) => {
         try {
-          const res = await makeTipRequest({
-            url: `${API.userSymptom}/${id}/complete-tip/${tipId}`,
-            method: 'PUT',
-          });
-      
-          const { message, data } = res.data;
-          setCompletedTipsData(data?.task?.completed_tips);
-      
-          toast.success('Tip completed successfully!');
-        } catch (error: any) {
-          if (error.response && error.response.data && error.response.data.error) {
-            const errorMessage = error.response.data.error;
-            toast.error(errorMessage); // Show the error message using toast.error
-          } else {
-            console.error('An error occurred:', error);
-            // If the error doesn't contain a specific message, you can show a generic error message
-            toast.error('An error occurred while completing the tip.');
-          }
+            const res = await makeTipRequest({
+                url: `${API.userSymptom}/${id}/complete-tip/${tipId}`,
+                method: 'PUT',
+            });
+            const { message, data } = res.data;
+
+            setCompletedTipsData(data?.task?.completed_tips);
+
+            if (message === 'Task completed successfully!') {
+                toast.success('Tip marked as completed successfully!');
+            } else {
+                toast.success('Tip marked as incomplete!');
+            }
+
+            fetchSymptoms();
+
+        } catch (e) {
+            console.error('Error completing tip:', e);
         }
-      };
+    };
 
     const completedTips = completedTipsData || [];
 
@@ -180,7 +179,7 @@ export default function Symptoms() {
                                         return (
                                             <div key={tipIndex} className="flex items-center justify-between bg-white p-3 space-x-1 rounded-[8px] relative">
                                                 <p
-                                                    className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${checkedStates[`${symptomCategoryKey?.id}-${tip?.id}`] || isChecked || isChecked2 ? 'line-through' : ''
+                                                    className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${isChecked || isChecked2 ? 'line-through' : ''
                                                         }`}
                                                 >
                                                     {tip?.name}
@@ -189,7 +188,7 @@ export default function Symptoms() {
                                                     <Checkbox
                                                         size="small"
                                                         className="translate-x-3"
-                                                        checked={checkedStates[`${symptomCategoryKey?.id}-${tip?.id}`] || isChecked || isChecked2}
+                                                        checked={isChecked || isChecked2}
                                                         onChange={() => handleSymptomCheckbox(symptomCategoryKey?.id, tip?.id)}
                                                         onClick={() => handleSymptomComplete(symptomCategoryKey?.id, tip?.id)}
                                                         sx={{
@@ -201,8 +200,7 @@ export default function Symptoms() {
                                                     />
                                                 </div>
                                             </div>
-                                        )
-
+                                        );
                                     })}
                                 </div>
                             </div>

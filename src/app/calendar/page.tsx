@@ -31,40 +31,40 @@ const Calendar = () => {
 
 
     // Get Symptoms
+    const fetchSymptoms = async () => {
+        try {
+            const res = await makeSymptomRequest({
+                url: API.userSymptom + '?include=symptoms,symptoms.tips',
+                method: 'GET',
+            });
+            const { data } = res.data;
+
+            // Extract all 'symptoms' arrays from the response data
+            const allSymptomsArrays = data?.symptoms;
+            const allSymptomsArraysNew = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
+            const c = data?.symptoms.map((item: any) => item?.completed_tips) || [];
+            setCompletedTipsData(c[0])
+
+            const mergedSymptoms = [].concat(...allSymptomsArraysNew);
+
+            // Filter out duplicate symptoms based on 'name'
+            const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
+                const x = acc.find((item: any) => item?.name === current?.name);
+                if (!x) {
+                    return acc.concat([current]);
+                } else {
+                    return acc;
+                }
+            }, []);
+
+            // Set the updated 'symptoms' array to the state
+            setAllSymptoms(allSymptomsArrays);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     useEffect(() => {
-        const fetchSymptoms = async () => {
-            try {
-                const res = await makeSymptomRequest({
-                    url: API.userSymptom + '?include=symptoms,symptoms.tips',
-                    method: 'GET',
-                });
-                const { data } = res.data;
-
-                // Extract all 'symptoms' arrays from the response data
-                const allSymptomsArrays = data?.symptoms;
-                const allSymptomsArraysNew = data?.symptoms.map((item: { symptoms: any; }) => item?.symptoms) || [];
-                const c = data?.symptoms.map((item: any) => item?.completed_tips) || [];
-                setCompletedTipsData(c[0])
-
-                const mergedSymptoms = [].concat(...allSymptomsArraysNew);
-
-                // Filter out duplicate symptoms based on 'name'
-                const uniqueSymptoms = mergedSymptoms.reduce((acc: any, current: any) => {
-                    const x = acc.find((item: any) => item?.name === current?.name);
-                    if (!x) {
-                        return acc.concat([current]);
-                    } else {
-                        return acc;
-                    }
-                }, []);
-
-                // Set the updated 'symptoms' array to the state
-                setAllSymptoms(allSymptomsArrays);
-            } catch (e) {
-                console.log(e);
-            }
-        };
-
         fetchSymptoms();
     }, []);
 
@@ -270,7 +270,7 @@ const Calendar = () => {
     };
 
 
-  
+
     const handleSymptomComplete = async (id: string, tipId: string) => {
         try {
             const res = await makeTipRequest({
@@ -278,14 +278,23 @@ const Calendar = () => {
                 method: 'PUT',
             });
             const { message, data } = res.data;
-            setCompletedTipsData(data?.task?.completed_tips)
 
-            toast.success('Tip completed successfully!');
+            setCompletedTipsData(data?.task?.completed_tips);
+
+            if (message === 'Task completed successfully!') {
+                toast.success('Tip marked as completed successfully!');
+            } else {
+                toast.success('Tip marked as incomplete!');
+            }
+
+            fetchSymptoms();
 
         } catch (e) {
-            console.log(e);
+            console.error('Error completing tip:', e);
         }
     };
+
+
 
     const completedTips = completedTipsData || [];
 
@@ -293,49 +302,49 @@ const Calendar = () => {
     const TipsBySymptom = () => {
         return (
             <div>
-            {allSymptoms.map((symptomCategoryKey: { symptoms: any[]; id: string; }, index: React.Key | null | undefined) => (
-                <React.Fragment key={index}>
-                    {symptomCategoryKey?.symptoms?.map((symptom: any, i: React.Key | null | undefined) => (
-                        <div key={i} className="mt-5">
-                            <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptom?.name}</h3>
-                            <div className="w-full grid grid-cols-1 gap-y-2 mt-3">
-                                {symptom?.tips?.map((tip: any, tipIndex: number) => {
-                                    const isChecked = completedTips.includes(tip?.name);
-                                    const isChecked2 = completedTipsData.includes(tip?.name);
+                {allSymptoms.map((symptomCategoryKey: { symptoms: any[]; id: string; }, index: React.Key | null | undefined) => (
+                    <React.Fragment key={index}>
+                        {symptomCategoryKey?.symptoms?.map((symptom: any, i: React.Key | null | undefined) => (
+                            <div key={i} className="mt-5">
+                                <h3 className="text-[2.8vw] font-[600] text-[#1E1E1E]">{symptom?.name}</h3>
+                                <div className="w-full grid grid-cols-1 gap-y-2 mt-3">
+                                    {symptom?.tips?.map((tip: any, tipIndex: number) => {
+                                        const isChecked = completedTips.includes(tip?.name);
+                                        const isChecked2 = completedTipsData.includes(tip?.name);
 
-                                    return (
-                                        <div key={tipIndex} className="flex items-center justify-between bg-white p-3 space-x-1 rounded-[8px] relative">
-                                            <p
-                                                className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${checkedStates[`${symptomCategoryKey?.id}-${tip?.id}`] || isChecked || isChecked2 ? 'line-through' : ''
-                                                    }`}
-                                            >
-                                                {tip?.name}
-                                            </p>
-                                            <div className="">
-                                                <Checkbox
-                                                    size="small"
-                                                    className="translate-x-3"
-                                                    checked={checkedStates[`${symptomCategoryKey?.id}-${tip?.id}`] || isChecked || isChecked2}
-                                                    onChange={() => handleSymptomCheckbox(symptomCategoryKey?.id, tip?.id)}
-                                                    onClick={() => handleSymptomComplete(symptomCategoryKey?.id, tip?.id)}
-                                                    sx={{
-                                                        color: '#939393',
-                                                        '&.Mui-checked': {
-                                                            color: '#392768',
-                                                        },
-                                                    }}
-                                                />
+                                        return (
+                                            <div key={tipIndex} className="flex items-center justify-between bg-white p-3 space-x-1 rounded-[8px] relative">
+                                                <p
+                                                    className={`text-[2.5vw] font-[500] text-[#1E1E1E] text-start ${isChecked || isChecked2 ? 'line-through' : ''
+                                                        }`}
+                                                >
+                                                    {tip?.name}
+                                                </p>
+                                                <div className="">
+                                                    <Checkbox
+                                                        size="small"
+                                                        className="translate-x-3"
+                                                        checked={isChecked || isChecked2}
+                                                        onChange={() => handleSymptomCheckbox(symptomCategoryKey?.id, tip?.id)}
+                                                        onClick={() => handleSymptomComplete(symptomCategoryKey?.id, tip?.id)}
+                                                        sx={{
+                                                            color: '#939393',
+                                                            '&.Mui-checked': {
+                                                                color: '#392768',
+                                                            },
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
-                                    )
+                                        );
+                                    })}
+                                </div>
 
-                                })}
                             </div>
-                        </div>
-                    ))}
-                </React.Fragment>
-            ))}
-        </div>
+                        ))}
+                    </React.Fragment>
+                ))}
+            </div>
         );
     };
 
