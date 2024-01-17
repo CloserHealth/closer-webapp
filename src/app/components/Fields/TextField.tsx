@@ -11,9 +11,9 @@ export default function TextField({ label, placeholder, value, require, id, type
     }
 
     return (
-        <div className="w-full">
-            <label htmlFor={id} className="block mb-2 text-[4vw] font-medium text-gray-900 dark:text-white w-full">{label}</label>
-            <div className="relative">
+        <div className="w-full flex flex-col">
+            <label htmlFor={id} className="mb-2 text-[4vw] font-medium text-gray-900 dark:text-white">{label}</label>
+            <div className="relative flex items-center">
                 <input
                     type={viewPassword ? "text" : type}
                     id={id}
@@ -25,7 +25,7 @@ export default function TextField({ label, placeholder, value, require, id, type
                     readOnly={readOnly}
                 />
                 {isPassword && (
-                    <div className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer' onClick={handleViewPassword}>
+                    <div className='pl-3 flex items-center cursor-pointer' onClick={handleViewPassword}>
                         <IconContext.Provider value={{ color: "#ababaa", size: "20px" }}>
                             <div>
                                 {viewPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
@@ -35,5 +35,6 @@ export default function TextField({ label, placeholder, value, require, id, type
                 )}
             </div>
         </div>
+
     )
 }
