@@ -18,7 +18,7 @@
     "chart.js": "^4.4.0",
     "framer-motion": "^10.16.4",
     "moment": "^2.29.4",
-    "next": "^14.0.5-canary.60",
+    "next": "^14.1.0",
     "rc-banner-anim": "^2.4.5",
     "rc-queue-anim": "^2.0.0",
     "react": "^18",
