@@ -44,3 +44,20 @@ export const calculateDaysLeft = (endDateStr: string | number | Date, startDateS
   return daysLeft;
 };
 
+
+
+export const goToLink = (link: string) => {
+  const a = document.createElement('a');
+  a.href = link;
+  // a.target = '_blank';
+  a.rel = 'noopener nonreferrer';
+  a.click();
+};
+
+export const goToLinkNewTab = (link: string) => {
+  const a = document.createElement('a');
+  a.target = '_blank';
+  a.href = link;
+  a.rel = 'noopener nonreferrer';
+  a.click();
+};
